@@ -1,5 +1,6 @@
 // Modified (Normalized) Logistic Sigmoid 
 
+//------------------------------------------------------------------
 float function_SigmoidLogitCombo (float x, float a){
   
   useParameterA = true;

@@ -6,6 +6,7 @@ import processing.pdf.*;
 boolean doSavePDF=false;
 
 boolean bDrawProbe = true;
+boolean bDrawBlooper = true;
 
 //-----------------------------------------------------
 float xscale = 300;
@@ -37,7 +38,7 @@ boolean bClickedInGraph = false;
 String functionName = "";
 
 int FUNCTIONMODE = 0;
-int NFUNCTIONS = 96;
+int NFUNCTIONS = 98;
 
 void keyPressed() {
   if (key == CODED) { 
@@ -227,6 +228,21 @@ void draw() {
     float qx, qy;
 
     //---------------------------
+    // draw the animating circle, inspired by @marcinignac @soulwire 
+    // http://codepen.io/vorg/full/Aqyre 
+    if (bDrawBlooper) {
+      noStroke(); 
+      smooth(); 
+      fill (160);
+      
+      float blooperCx = margin0+bandTh/2.0;
+      float blooperCy = margin0+bandTh/2.0;
+      float blooperR = bandTh * function (probe_x, param_a, param_b, param_c, param_d, param_n);
+      ellipse (blooperCx, blooperCy, blooperR, blooperR);
+    }
+    
+    
+    //---------------------------
     // draw the probe
     if (bDrawProbe) {
       x = constrain(probe_x, 0, 1);
@@ -241,7 +257,7 @@ void draw() {
       fill(0);
       noStroke();
       ellipseMode(CENTER);
-      ellipse(30, py, 11, 11);
+      ellipse(margin0+bandTh/2.0, py, 11, 11);
     }
 
     //---------------------------
@@ -755,6 +771,12 @@ float function (float x, float a, float b, float c, float d, int n) {
   
   case 95: 
     out = function_GeneralizedLinearMap (x, a, b, c, d);
+    break;
+  case 96:
+    out = function_AdjustableCenterCosineWindow (x,a);
+    break;
+  case 97: 
+    out = function_AdjustableCenterEllipticWindow (x,a);
     break;
   }
   return out;

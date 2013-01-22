@@ -470,6 +470,31 @@ float function_TukeyWindow (float x, float a) {
 }
 
 
+
+
+//------------------------------------------------------------------
+float function_AdjustableCenterCosineWindow (float x, float a) {
+  functionName = "Adjustable Center Cosine Window";
+  useParameterA = true; 
+  useParameterB = useParameterC = useParameterD = useParameterN = false;
+
+  float ah = a/2.0; 
+  float omah = 1.0 - ah;
+
+  float y = 1.0;
+  if (x <= a) {
+    y = 0.5 * (1.0 + cos(PI* ((x/a) - 1.0)));
+  } 
+  else {
+    y = 0.5 * (1.0 + cos(PI* (((x-a)/(1.0-a))  )));
+  } 
+  return y;
+}
+
+
+
+
+
 //------------------------------------------------------------------
 float function_CosineWindow (float x) {
   // http://en.wikipedia.org/wiki/Window_function 
