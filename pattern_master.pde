@@ -2,6 +2,15 @@
 // Golan Levin, golan@flong.com
 // Spring 2006 - January 2013
 
+
+// TO DO
+// Ogee Curves
+// http://engineeringtraining.tpub.com/14069/css/14069_150.htm
+// http://en.wikipedia.org/wiki/Generalised_logistic_function Richard's Curve
+// http://en.wikipedia.org/wiki/Probit_function
+// http://mathworld.wolfram.com/HeavisideStepFunction.html
+// http://web.mit.edu/fnl/volume/204/winston.html winston's smoothed staircase
+
 import processing.pdf.*;
 boolean doSavePDF=false;
 
@@ -38,7 +47,7 @@ boolean bClickedInGraph = false;
 String functionName = "";
 
 int FUNCTIONMODE = 0;
-int NFUNCTIONS = 98;
+int NFUNCTIONS = 99;
 
 void keyPressed() {
   if (key == CODED) { 
@@ -777,6 +786,10 @@ float function (float x, float a, float b, float c, float d, int n) {
     break;
   case 97: 
     out = function_AdjustableCenterEllipticWindow (x,a);
+    break;
+  case 98: 
+    param_n = 7;
+    out = function_ExponentialSmoothedStaircase (x, a, param_n);
     break;
   }
   return out;

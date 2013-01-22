@@ -312,6 +312,28 @@ float function_Staircase (float x, int n) {
 }
 
 //------------------------------------------------------------------
+float function_ExponentialSmoothedStaircase (float x, float a, int n) {
+  functionName = "Smoothed Exponential Staircase";
+  // http://web.mit.edu/fnl/volume/204/winston.html
+  useParameterA = true;
+  useParameterB = useParameterC = useParameterD = false; 
+  useParameterN = true;
+  
+  
+  float fa =  sq(map(a,0,1, 5,30));
+  
+
+  float y = 0; 
+  for (int i=0; i<n; i++){
+    y += (1.0/(n-1.0))/ (1.0 + exp(fa*(((i+1.0)/n) - x)));
+  }
+  y = constrain(y, 0,1); 
+  return y;
+}
+
+
+
+//------------------------------------------------------------------
 float function_Gompertz (float x, float a) {
   // http://en.wikipedia.org/wiki/Gompertz_curve
   functionName = "Gompertz Function";
@@ -335,8 +357,4 @@ float function_Gompertz (float x, float a) {
 
 
 
-// Ogee Curves
-// http://engineeringtraining.tpub.com/14069/css/14069_150.htm
-
-// http://en.wikipedia.org/wiki/Probit_function
 
