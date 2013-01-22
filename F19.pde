@@ -33,3 +33,14 @@ float function_Identity (float x){
   useParameterN = false;
    return x;
 }
+
+
+float function_Inverse (float x){
+    functionName = "Inverse Function";
+  useParameterA = false;
+  useParameterB = false;
+  useParameterC = false;
+  useParameterD = false;
+  useParameterN = false;
+   return 1.0-x;
+}

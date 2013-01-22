@@ -47,7 +47,7 @@ boolean bClickedInGraph = false;
 String functionName = "";
 
 int FUNCTIONMODE = 0;
-int NFUNCTIONS = 99;
+int NFUNCTIONS = 100; //!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 void keyPressed() {
   if (key == CODED) { 
@@ -790,6 +790,10 @@ float function (float x, float a, float b, float c, float d, int n) {
   case 98: 
     param_n = 7;
     out = function_ExponentialSmoothedStaircase (x, a, param_n);
+    break;
+  
+  case 99: 
+    out = function_Inverse (x); 
     break;
   }
   return out;
