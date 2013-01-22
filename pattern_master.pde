@@ -37,7 +37,7 @@ boolean bClickedInGraph = false;
 String functionName = "";
 
 int FUNCTIONMODE = 0;
-int NFUNCTIONS = 95;
+int NFUNCTIONS = 96;
 
 void keyPressed() {
   if (key == CODED) { 
@@ -396,7 +396,7 @@ void drawModeSpecificGraphics() {
     break;
 
   case 19:
-  case 94:
+  case 95:
     xa = xoffset + param_a * xscale;
     yb = yoffset + (1-param_b) * yscale;
     xc = xoffset + param_c * xscale;
@@ -742,14 +742,18 @@ float function (float x, float a, float b, float c, float d, int n) {
   case 91: 
     out = function_Gompertz (x, a); 
     break;
+    
   case 92: 
     out = function_NormalizedLogit (x, a); 
     break;
-
   case 93: 
     out = function_NormalizedLogisticSigmoid (x, a); 
     break;
   case 94: 
+    out = function_SigmoidLogitCombo (x, a); 
+    break;  
+  
+  case 95: 
     out = function_GeneralizedLinearMap (x, a, b, c, d);
     break;
   }

@@ -1,6 +1,22 @@
 // Modified (Normalized) Logistic Sigmoid 
 
-
+float function_SigmoidLogitCombo (float x, float a){
+  
+  useParameterA = true;
+  useParameterB = false;
+  useParameterC = false;
+  useParameterD = false;
+  useParameterN = false;
+  
+  float y = 0; 
+  if (a < 0.5){
+    y = function_NormalizedLogit (x, 1.0-(2.0*a));
+  } else {
+    y = function_NormalizedLogisticSigmoid (x, (2.0*(a-0.5)));
+  }
+  functionName = "Sigmoid-Logit Combination";
+  return y;
+}
 
 //------------------------------------------------------------------
 float function_NormalizedLogisticSigmoid (float x, float a) {
