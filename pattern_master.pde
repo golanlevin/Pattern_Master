@@ -1,13 +1,9 @@
-//import processing.opengl.*;
-//import processing.pdf.*;
-// boolean dosave=false;
-
-
 // PATTERN MASTER
 // Golan Levin, golan@flong.com
-// Spring 2006
+// Spring 2006 - January 2013
 
-
+import processing.pdf.*;
+boolean doSavePDF=false;
 
 boolean bDrawProbe = true;
 
@@ -41,7 +37,7 @@ boolean bClickedInGraph = false;
 String functionName = "";
 
 int FUNCTIONMODE = 0;
-int NFUNCTIONS = 94;
+int NFUNCTIONS = 95;
 
 void keyPressed() {
   if (key == CODED) { 
@@ -52,7 +48,9 @@ void keyPressed() {
       FUNCTIONMODE = (FUNCTIONMODE-1+NFUNCTIONS)%NFUNCTIONS;
     }
   } 
-  // if(key=='s') dosave=true;
+  if (key=='P') {
+    doSavePDF = true;
+  }
 }
 
 //-----------------------------------------------------
@@ -69,103 +67,123 @@ void setup() {
 void mouseMoved() {
   visited = true;
 }
+
+int whichButton = 0; 
 void mousePressed() {
   bClickedInGraph = false;
   if ((mouseX >= xoffset) && (mouseX <= (xoffset + xscale)) && 
     (mouseY >= yoffset) && (mouseY <= (yoffset + yscale))) {
+
+    if (mouseButton == LEFT) {
+      whichButton = 1;
+    } 
+    else if (mouseButton == RIGHT) {
+      whichButton = 2;
+    } 
+    else {
+      whichButton = 0;
+    }
+
     bClickedInGraph = true;
   }
 }
 
-/*
+void mouseReleased() {
+  whichButton = 0;
+}
+
+
+
 //====================================================
- void drawPDF(){
- 
- 
- String pdfFilename = functionName;
- if (useParameterA){ 
- pdfFilename += "_a=" + nf(param_a, 1, 2);
- }
- if (useParameterB){ 
- pdfFilename += "_b=" + nf(param_b, 1, 2);
- }
- if (useParameterC){ 
- pdfFilename += "_c=" + nf(param_c, 1, 2);
- }
- if (useParameterD){ 
- pdfFilename += "_d=" + nf(param_d, 1, 2);
- }
- if (useParameterN){ 
- pdfFilename += "_n=" + nf(param_n, 1, 2);
- }
- pdfFilename += ".pdf";
- 
- 
- 
- PGraphicsPDF pdf=(PGraphicsPDF)beginRaw(PDF, pdfFilename); 
- pdf.strokeJoin(MITER);
- pdf.strokeCap(ROUND);
- pdf.strokeWeight(0);
- pdf.noFill();
- pdf.stroke(0);
- pdf.rect(0,0, width,height);
- 
- background (255,255,255);
- stroke(128);
- fill(255);
- rect(xoffset, yoffset, xscale, yscale);
- drawModeSpecificGraphics();
- 
- // draw the function's curve
- float x = 0;
- float y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
- float qx = xoffset + xscale * x;
- float qy = yoffset + yscale * y;
- float px = qx;
- float  py = qy;
- stroke(0);
- beginShape(LINE_STRIP);
- vertex(px,py);
- for (float i=0; i<=xscale; i+=0.1){
- x = (float)i/xscale;
- y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
- px = xoffset + (xscale * x);
- py = yoffset + (yscale * y);
- //line (qx, qy, px, py);
- vertex(px,py);
- qx = px;
- qy = py;
- }
- endShape();
- 
- 
- //---------------------------
- // draw the function's gray levels
- py = yoffset-(bandTh+margin1);
- qy = yoffset-margin1;
- beginShape(QUAD_STRIP);
- for (float j=0; j<=xscale; j++){
- float j1 = j; 
- float x1 = j1/(float)xscale;
- float y1 = function (1-x1, param_a, param_b, param_c, param_d, param_n);
- float g1 = 255.0 * y1;
- float px1 = xoffset + xscale - j1;
- 
- noStroke();
- fill(g1,g1,g1);
- vertex(px1,py); 
- vertex(px1,qy); 
- }
- endShape();
- noFill();
- stroke(128);
- rect(xoffset, yoffset-(bandTh+margin1), xscale, bandTh);
- 
- 
- endRaw();
- dosave=false;
- }
- */
+void drawPDF() {
+
+
+  String pdfFilename = functionName;
+  if (useParameterA) { 
+    pdfFilename += "_a=" + nf(param_a, 1, 2);
+  }
+  if (useParameterB) { 
+    pdfFilename += "_b=" + nf(param_b, 1, 2);
+  }
+  if (useParameterC) { 
+    pdfFilename += "_c=" + nf(param_c, 1, 2);
+  }
+  if (useParameterD) { 
+    pdfFilename += "_d=" + nf(param_d, 1, 2);
+  }
+  if (useParameterN) { 
+    pdfFilename += "_n=" + nf(param_n, 1, 2);
+  }
+  pdfFilename += ".pdf";
+
+
+  beginRecord(PDF, pdfFilename); 
+  
+  strokeJoin(MITER);
+  strokeCap(ROUND);
+  strokeWeight(1.0);
+  noFill();
+  stroke(0);
+  rect(0, 0, width, height);
+
+  background (255, 255, 255);
+  stroke(128);
+  fill(255);
+  rect(xoffset, yoffset, xscale, yscale);
+  drawModeSpecificGraphics();
+
+  // draw the function's curve
+  float x = 0;
+  float y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
+  float qx = xoffset + xscale * x;
+  float qy = yoffset + yscale * y;
+  float px = qx;
+  float  py = qy;
+  stroke(0);
+  noFill();
+  beginShape();
+  vertex(px, py);
+  for (float i=0; i<=xscale; i+=0.1) {
+    x = (float)i/xscale;
+    y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
+    px = xoffset + (xscale * x);
+    py = yoffset + (yscale * y);
+    //line (qx, qy, px, py);
+    vertex(px, py);
+    qx = px;
+    qy = py;
+  }
+  endShape();
+
+
+  //---------------------------
+  // draw the function's gray levels
+  py = yoffset-(bandTh+margin1);
+  qy = yoffset-margin1;
+  beginShape(QUAD_STRIP);
+  for (float j=0; j<=xscale; j++) {
+    float j1 = j; 
+    float x1 = j1/(float)xscale;
+    float y1 = function (1-x1, param_a, param_b, param_c, param_d, param_n);
+    float g1 = 255.0 * y1;
+    float px1 = xoffset + xscale - j1;
+
+    noStroke();
+    fill(g1, g1, g1);
+    vertex(px1, py); 
+    vertex(px1, qy);
+  }
+  endShape();
+  noFill();
+  stroke(128);
+  rect(xoffset, yoffset-(bandTh+margin1), xscale, bandTh);
+
+
+  endRecord();
+  strokeWeight (1); 
+  doSavePDF=false;
+}
+
 
 
 //-----------------------
@@ -174,98 +192,110 @@ void draw() {
   probe_x =  (abs(millis()%2000-1000))/1000.0;
   if (mousePressed && bClickedInGraph) {
     if (visited) {
-      param_a =   (float)(mouseX - xoffset)/xscale;
-      param_b = 1-(float)(mouseY - yoffset)/yscale;
-      param_a = constrain(param_a, 0, 1); 
-      param_b = constrain(param_b, 0, 1);
+
+      if (whichButton == 1) {
+        param_a =   (float)(mouseX - xoffset)/xscale;
+        param_b = 1-(float)(mouseY - yoffset)/yscale;
+        param_a = constrain(param_a, 0, 1); 
+        param_b = constrain(param_b, 0, 1);
+      } 
+      else if (whichButton == 2) {
+        param_c =   (float)(mouseX - xoffset)/xscale;
+        param_d = 1-(float)(mouseY - yoffset)/yscale;
+        param_c = constrain(param_c, 0, 1); 
+        param_d = constrain(param_d, 0, 1);
+      }
     }
   } 
   param_n = 2;
 
-  /*
-  if (dosave){
-   drawPDF();
-   }  else{
-   */
 
-  background (255);//216,216,216);
-  fill(255, 255, 255);
-  stroke(0);
+  if (doSavePDF) {
+    drawPDF();
+    doSavePDF = false;
+  }  
+  else {
 
 
-  float x, y;
-  float px, py;
-  float qx, qy;
-
-  //---------------------------
-  // draw the probe
-  if (bDrawProbe) {
-    x = constrain(probe_x, 0, 1);
-    y = probe_y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
-    px = xoffset + round(xscale * x);
-    py = yoffset + round(yscale * y);
-    qy = yoffset + yscale;
-    stroke(255, 128, 128);
-    line (px, qy, px, py);
-    stroke(128, 128, 255);
-    line (px, py, xoffset, py);
-    fill(0);
-    noStroke();
-    ellipseMode(CENTER);
-    ellipse(30, py, 11, 11);
-  }
-
-  //---------------------------
-  // extra mode-specific graphics for Bezier
-  drawModeSpecificGraphics();
-
-  //---------------------------
-  // draw the function's curve
-  x = 0;
-  y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
-  qx = xoffset + xscale * x;
-  qy = yoffset + yscale * y;
-  px = qx;
-  py = qy;
-
-  for (int i=0; i<=xscale; i++) {
-    x = (float)i/xscale;
-    y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
-
+    background (255);//216,216,216);
+    fill(255, 255, 255);
     stroke(0);
-    if ((y < 0) || (y > 1)) {
-      stroke(200);
-    } 
 
-    px = xoffset + round(xscale * x);
-    py = yoffset + round(yscale * y);
-    line (qx, qy, px, py);
-    qx = px;
-    qy = py;
+
+    float x, y;
+    float px, py;
+    float qx, qy;
+
+    //---------------------------
+    // draw the probe
+    if (bDrawProbe) {
+      x = constrain(probe_x, 0, 1);
+      y = probe_y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
+      px = xoffset + round(xscale * x);
+      py = yoffset + round(yscale * y);
+      qy = yoffset + yscale;
+      stroke(255, 128, 128);
+      line (px, qy, px, py);
+      stroke(128, 128, 255);
+      line (px, py, xoffset, py);
+      fill(0);
+      noStroke();
+      ellipseMode(CENTER);
+      ellipse(30, py, 11, 11);
+    }
+
+    //---------------------------
+    // extra mode-specific graphics for Bezier
+    drawModeSpecificGraphics();
+
+    //---------------------------
+    // draw the function's curve
+    x = 0;
+    y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
+    qx = xoffset + xscale * x;
+    qy = yoffset + yscale * y;
+    px = qx;
+    py = qy;
+
+    for (int i=0; i<=xscale; i++) {
+      x = (float)i/xscale;
+      y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
+
+      stroke(0);
+      if ((y < 0) || (y > 1)) {
+        stroke(200);
+      } 
+
+      px = xoffset + round(xscale * x);
+      py = yoffset + round(yscale * y);
+      line (qx, qy, px, py);
+      qx = px;
+      qy = py;
+    }
+
+    //---------------------------
+    // draw the function's gray levels
+    float g = 0;
+    for (int j=0; j<=xscale; j++) {
+      x = (float)j/xscale;
+      y = function (1-x, param_a, param_b, param_c, param_d, param_n);
+      g = 255.0 * y;
+      stroke(g, g, g);
+      py = yoffset-(bandTh+margin1);
+      qy = yoffset-margin1;
+      px = xoffset + xscale - j;
+      line (px, py, px, qy);
+    }
+    noFill();
+    stroke(128);
+    rect(xoffset, yoffset-(bandTh+margin1), xscale, bandTh);
+
+    //---------------------------
+    stroke(0);
+    rect(xoffset, yoffset, xscale, yscale);
+    rect(margin0, yoffset, bandTh, yscale);
+    drawLabels();
   }
-
-  //---------------------------
-  // draw the function's gray levels
-  float g = 0;
-  for (int j=0; j<=xscale; j++) {
-    x = (float)j/xscale;
-    y = function (1-x, param_a, param_b, param_c, param_d, param_n);
-    g = 255.0 * y;
-    stroke(g, g, g);
-    py = yoffset-(bandTh+margin1);
-    qy = yoffset-margin1;
-    px = xoffset + xscale - j;
-    line (px, py, px, qy);
-  }
-  noFill();
-  stroke(128);
-  rect(xoffset, yoffset-(bandTh+margin1), xscale, bandTh);
-
-  //---------------------------
-  stroke(0);
-  rect(xoffset, yoffset, xscale, yscale);
-  rect(margin0, yoffset, bandTh, yscale);
-  drawLabels();
 }
 
 
@@ -366,6 +396,7 @@ void drawModeSpecificGraphics() {
     break;
 
   case 19:
+  case 94:
     xa = xoffset + param_a * xscale;
     yb = yoffset + (1-param_b) * yscale;
     xc = xoffset + param_c * xscale;
@@ -717,6 +748,9 @@ float function (float x, float a, float b, float c, float d, int n) {
 
   case 93: 
     out = function_NormalizedLogisticSigmoid (x, a); 
+    break;
+  case 94: 
+    out = function_GeneralizedLinearMap (x, a, b, c, d);
     break;
   }
   return out;
