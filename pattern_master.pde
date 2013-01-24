@@ -10,12 +10,17 @@
 // http://en.wikipedia.org/wiki/Probit_function
 // http://mathworld.wolfram.com/HeavisideStepFunction.html
 // http://web.mit.edu/fnl/volume/204/winston.html winston's smoothed staircase
+// introspection
 
 import processing.pdf.*;
 boolean doSavePDF=false;
 
 boolean bDrawProbe = true;
 boolean bDrawBlooper = true;
+boolean bDrawGrayScale = true;
+boolean bDrawNoiseHistories = true; 
+
+color boundingBoxStrokeColor = color(180); 
 
 //-----------------------------------------------------
 float xscale = 300;
@@ -46,9 +51,13 @@ boolean visited = false;
 boolean bClickedInGraph = false;
 String functionName = "";
 
+float noiseRawHistory[]; 
+float noiseFilteredHistory[];
+
 int FUNCTIONMODE = 0;
 int NFUNCTIONS = 100; //!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+//-----------------------------------------------------
 void keyPressed() {
   if (key == CODED) { 
     if ((keyCode == UP) || (keyCode == RIGHT)) { 
@@ -66,14 +75,18 @@ void keyPressed() {
 //-----------------------------------------------------
 void setup() {
   int scrW = (int)(margin0 + bandTh + margin1 + xscale + margin0);
-  int scrH = (int)(margin0 + bandTh + margin1 + yscale + margin2 + margin0);
+  int scrH = (int)(margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin0 );
   size (scrW, scrH);// OPENGL);
-  println(scrW + " " + scrH);
-  // PFont font = loadFont("QuickTypeIIMono-24.vlw");
-  //textFont(font, 12);
+  println("App dimensions: " + scrW + " x " + scrH);
+
+  noiseRawHistory = new float[(int)xscale];
+  noiseFilteredHistory = new float[(int)xscale];
+  for (int i=0; i<xscale; i++) {
+    noiseFilteredHistory[i] = noiseRawHistory[i] = 0.5;
+  }
 }
 
-//-----------------------
+//-----------------------------------------------------
 void mouseMoved() {
   visited = true;
 }
@@ -128,7 +141,7 @@ void drawPDF() {
 
 
   beginRecord(PDF, pdfFilename); 
-  
+
   strokeJoin(MITER);
   strokeCap(ROUND);
   strokeWeight(1.0);
@@ -196,9 +209,60 @@ void drawPDF() {
 
 
 
-//-----------------------
+//-----------------------------------------------------
 void draw() {
+  
+  updateParameters(); 
 
+  if (doSavePDF) {
+    drawPDF();
+    doSavePDF = false;
+  }  
+  else {
+    
+    background (255);
+    
+    //---------------------------
+    // Draw the animating probe
+    if (bDrawProbe) {
+      drawAnimatingProbe();
+    }
+
+    //---------------------------
+    // Draw the animating circle 
+    if (bDrawBlooper) {
+      drawAnimatingBlooper();
+    }
+
+    //---------------------------
+    // extra mode-specific graphics for Bezier
+    drawModeSpecificGraphics();
+
+    //---------------------------
+    // draw the function's curve
+    drawMainFunctionCurve();
+
+    //---------------------------
+    // Draw the function's gray levels
+    if (bDrawGrayScale) {
+      drawGrayLevels();
+    }
+
+    //---------------------------
+    // Draw a noise signal, and a filtered version.
+    if (bDrawNoiseHistories) {
+      drawNoiseHistories();
+    }
+
+    //---------------------------
+    // Draw labels
+    drawLabels();
+  }
+}
+
+//-----------------------------------------------------
+void updateParameters(){
+  
   probe_x =  (abs(millis()%2000-1000))/1000.0;
   if (mousePressed && bClickedInGraph) {
     if (visited) {
@@ -218,109 +282,152 @@ void draw() {
     }
   } 
   param_n = 2;
+}
 
 
-  if (doSavePDF) {
-    drawPDF();
-    doSavePDF = false;
-  }  
-  else {
+//-----------------------------------------------------
+void drawMainFunctionCurve() {
+  float x, y;
+  float px, py;
+  float qx, qy;
 
+  stroke(boundingBoxStrokeColor);
+  rect(xoffset, yoffset, xscale, yscale);
 
-    background (255);//216,216,216);
-    fill(255, 255, 255);
-    stroke(0);
+  x = 0;
+  y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
+  qx = xoffset + xscale * x;
+  qy = yoffset + yscale * y;
+  px = qx;
+  py = qy;
 
-
-    float x, y;
-    float px, py;
-    float qx, qy;
-
-    //---------------------------
-    // draw the animating circle, inspired by @marcinignac @soulwire 
-    // http://codepen.io/vorg/full/Aqyre 
-    if (bDrawBlooper) {
-      noStroke(); 
-      smooth(); 
-      fill (160);
-      
-      float blooperCx = margin0+bandTh/2.0;
-      float blooperCy = margin0+bandTh/2.0;
-      float blooperR = bandTh * function (probe_x, param_a, param_b, param_c, param_d, param_n);
-      ellipse (blooperCx, blooperCy, blooperR, blooperR);
-    }
-    
-    
-    //---------------------------
-    // draw the probe
-    if (bDrawProbe) {
-      x = constrain(probe_x, 0, 1);
-      y = probe_y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
-      px = xoffset + round(xscale * x);
-      py = yoffset + round(yscale * y);
-      qy = yoffset + yscale;
-      stroke(255, 128, 128);
-      line (px, qy, px, py);
-      stroke(128, 128, 255);
-      line (px, py, xoffset, py);
-      fill(0);
-      noStroke();
-      ellipseMode(CENTER);
-      ellipse(margin0+bandTh/2.0, py, 11, 11);
-    }
-
-    //---------------------------
-    // extra mode-specific graphics for Bezier
-    drawModeSpecificGraphics();
-
-    //---------------------------
-    // draw the function's curve
-    x = 0;
+  for (int i=0; i<=xscale; i++) {
+    x = (float)i/xscale;
     y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
-    qx = xoffset + xscale * x;
-    qy = yoffset + yscale * y;
-    px = qx;
-    py = qy;
 
-    for (int i=0; i<=xscale; i++) {
-      x = (float)i/xscale;
-      y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
-
-      stroke(0);
-      if ((y < 0) || (y > 1)) {
-        stroke(200);
-      } 
-
-      px = xoffset + round(xscale * x);
-      py = yoffset + round(yscale * y);
-      line (qx, qy, px, py);
-      qx = px;
-      qy = py;
-    }
-
-    //---------------------------
-    // draw the function's gray levels
-    float g = 0;
-    for (int j=0; j<=xscale; j++) {
-      x = (float)j/xscale;
-      y = function (1-x, param_a, param_b, param_c, param_d, param_n);
-      g = 255.0 * y;
-      stroke(g, g, g);
-      py = yoffset-(bandTh+margin1);
-      qy = yoffset-margin1;
-      px = xoffset + xscale - j;
-      line (px, py, px, qy);
-    }
-    noFill();
-    stroke(128);
-    rect(xoffset, yoffset-(bandTh+margin1), xscale, bandTh);
-
-    //---------------------------
     stroke(0);
-    rect(xoffset, yoffset, xscale, yscale);
-    rect(margin0, yoffset, bandTh, yscale);
-    drawLabels();
+    if ((y < 0) || (y > 1)) {
+      stroke(200);
+    } 
+
+    px = xoffset + round(xscale * x);
+    py = yoffset + round(yscale * y);
+    line (qx, qy, px, py);
+    qx = px;
+    qy = py;
   }
+}
+
+
+//-----------------------------------------------------
+void drawAnimatingProbe() {
+
+  // inspired by @marcinignac & @soulwire 
+  // http://codepen.io/vorg/full/Aqyre 
+
+  float x = constrain(probe_x, 0, 1);
+  float y = probe_y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
+  float px = xoffset + round(xscale * x);
+  float py = yoffset + round(yscale * y);
+  float qy = yoffset + yscale;
+
+  // draw bounding box
+  noFill();
+  stroke(boundingBoxStrokeColor);
+  rect(margin0, yoffset, bandTh, yscale);
+
+  // draw probe element
+  stroke(255, 128, 128);
+  line (px, qy, px, py);
+  stroke(128, 128, 255);
+  line (px, py, xoffset, py);
+  fill(0);
+  noStroke();
+  ellipseMode (CENTER);
+  ellipse(margin0+bandTh/2.0, py, 11, 11);
+}
+
+
+//-----------------------------------------------------
+void drawAnimatingBlooper() {
+  // draw the animating circle, inspired by @marcinignac & @soulwire 
+  // http://codepen.io/vorg/full/Aqyre 
+
+  noStroke(); 
+  smooth(); 
+  fill (160);
+
+  float blooperCx = margin0+bandTh/2.0;
+  float blooperCy = margin0+bandTh/2.0;
+  float blooperR = bandTh * function (probe_x, param_a, param_b, param_c, param_d, param_n);
+  ellipse (blooperCx, blooperCy, blooperR, blooperR);
+}
+
+//-----------------------------------------------------
+void drawGrayLevels() {
+
+  smooth();
+  for (int j=0; j<=xscale; j++) {
+    float x = (float)j / (float)xscale;
+    float y = function (1.0-x, param_a, param_b, param_c, param_d, param_n);
+    float g = 255.0 * y;
+
+    float py = yoffset-(bandTh+margin1);
+    float qy = yoffset-margin1;
+    float px = xoffset + xscale - j;
+
+    stroke(g, g, g);
+    line (px, py, px, qy);
+  }
+
+  // draw the bounding box
+  noFill();
+  stroke(boundingBoxStrokeColor);
+  rect(xoffset, yoffset-(bandTh+margin1), xscale, bandTh);
+}
+
+
+//-----------------------------------------------------
+void drawNoiseHistories() {
+
+  int nData = (int)xscale; 
+  for (int i=0; i<(nData-1); i++) {
+    noiseRawHistory[i] = noiseRawHistory[i+1];
+  }
+  noiseRawHistory[nData-1] = noise(millis()/(nData/2.0)); 
+  float nhy = margin0 + bandTh + margin1 + yscale + margin2;
+
+  // draw bounding rectangle
+  noFill(); 
+  stroke(boundingBoxStrokeColor);
+  rect (xoffset, nhy, xscale, bandTh);
+
+  // draw raw noise history
+  noFill(); 
+  stroke(180); 
+  beginShape(); 
+  for (int i=0; i<nData; i++) {
+    float x = xoffset + i;
+    float valRaw = 1.0 - constrain(noiseRawHistory[i], 0, 1);
+    float y = nhy + bandTh * valRaw;
+    vertex(x, y);
+  }
+  endShape(); 
+
+
+  // draw filtered noise history
+  noFill(); 
+  stroke(0); 
+  beginShape(); 
+  for (int i=0; i<nData; i++) {
+    float x = xoffset + i;
+    float valRaw = noiseRawHistory[i];
+    float valFiltered = 1.0 - function (valRaw, param_a, param_b, param_c, param_d, param_n);
+    valFiltered = constrain(valFiltered, 0, 1); 
+    float y = nhy + bandTh * valFiltered;
+    vertex(x, y);
+  }
+  endShape();
 }
 
 
@@ -767,7 +874,7 @@ float function (float x, float a, float b, float c, float d, int n) {
   case 91: 
     out = function_Gompertz (x, a); 
     break;
-    
+
   case 92: 
     out = function_NormalizedLogit (x, a); 
     break;
@@ -777,25 +884,75 @@ float function (float x, float a, float b, float c, float d, int n) {
   case 94: 
     out = function_SigmoidLogitCombo (x, a); 
     break;  
-  
+
   case 95: 
     out = function_GeneralizedLinearMap (x, a, b, c, d);
     break;
   case 96:
-    out = function_AdjustableCenterCosineWindow (x,a);
+    out = function_AdjustableCenterCosineWindow (x, a);
     break;
   case 97: 
-    out = function_AdjustableCenterEllipticWindow (x,a);
+    out = function_AdjustableCenterEllipticWindow (x, a);
     break;
   case 98: 
     param_n = 7;
     out = function_ExponentialSmoothedStaircase (x, a, param_n);
     break;
-  
+
   case 99: 
     out = function_Inverse (x); 
     break;
   }
   return out;
 }
+
+
+
+
+
+///////////////////////////////////////////////////////////
+// Notes for introspection implementation (TO DO)
+
+/*
+
+//import java.lang.*;
+import java.lang.reflect.Method;
+// http://docs.oracle.com/javase/1.5.0/docs/api/java/lang/Object.html
+// http://docs.oracle.com/javase/1.5.0/docs/api/java/lang/reflect/Method.html
+// http://docs.oracle.com/javase/1.5.0/docs/api/java/lang/Class.html
+
+void setup() {
+  try {
+    String fullClassName = this.getClass().getName() + "$" + "Booper";
+    Class c = Class.forName(fullClassName);
+    // println ( c.getMethods() );
+   
+    Method[] methods = c.getMethods();
+    if (methods.length>0) {
+      for (int i=0; i<methods.length; i++) {
+        Method m = methods[i];
+        String t = m.getReturnType().toString();
+        println(i + ": "  + t);
+      }
+    }
+   
+  }
+  catch (Exception e) {
+    println (e);
+  }
+}
+
+void draw() {
+}
+
+class Booper {
+  float methodA (float a, float b) {
+    return (a+b);
+  }
+
+  float methodB (float a, float b, float c) {
+    return (a*b*c);
+  }
+}
+*/
 
