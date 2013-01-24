@@ -882,7 +882,7 @@ float function (float x, float a, float b, float c, float d, int n) {
     out = function_NormalizedLogisticSigmoid (x, a); 
     break;
   case 94: 
-    out = function_SigmoidLogitCombo (x, a); 
+    out = function_GeneralSigmoidLogitCombo (x, a, b); 
     break;  
 
   case 95: 
