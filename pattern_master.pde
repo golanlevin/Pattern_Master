@@ -9,8 +9,11 @@
 // http://en.wikipedia.org/wiki/Generalised_logistic_function Richard's Curve
 // http://en.wikipedia.org/wiki/Probit_function
 // http://mathworld.wolfram.com/HeavisideStepFunction.html
-// http://web.mit.edu/fnl/volume/204/winston.html winston's smoothed staircase
 // introspection
+
+import java.lang.*;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 import processing.pdf.*;
 boolean doSavePDF=false;
@@ -55,7 +58,7 @@ float noiseRawHistory[];
 float noiseFilteredHistory[];
 
 int FUNCTIONMODE = 0;
-int NFUNCTIONS = 100; //!!!!!!!!!!!!!!!!!!!!!!!!!!
+int NFUNCTIONS = 101; //!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 //-----------------------------------------------------
 void keyPressed() {
@@ -77,13 +80,15 @@ void setup() {
   int scrW = (int)(margin0 + bandTh + margin1 + xscale + margin0);
   int scrH = (int)(margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin0 );
   size (scrW, scrH);// OPENGL);
-  println("App dimensions: " + scrW + " x " + scrH);
+  // println("App dimensions: " + scrW + " x " + scrH);
 
   noiseRawHistory = new float[(int)xscale];
   noiseFilteredHistory = new float[(int)xscale];
   for (int i=0; i<xscale; i++) {
     noiseFilteredHistory[i] = noiseRawHistory[i] = 0.5;
   }
+  
+  introspect(); 
 }
 
 //-----------------------------------------------------
@@ -902,6 +907,10 @@ float function (float x, float a, float b, float c, float d, int n) {
   case 99: 
     out = function_Inverse (x); 
     break;
+  case 100: 
+    out = function_SlidingAdjustableSigmaGaussian (x, a, b); 
+    break;
+    
   }
   return out;
 }
@@ -913,17 +922,18 @@ float function (float x, float a, float b, float c, float d, int n) {
 ///////////////////////////////////////////////////////////
 // Notes for introspection implementation (TO DO)
 
-/*
 
-//import java.lang.*;
-import java.lang.reflect.Method;
+
+// import java.lang.*;
+// import java.lang.reflect.Method;
+// import java.lang.reflect.Type;
 // http://docs.oracle.com/javase/1.5.0/docs/api/java/lang/Object.html
 // http://docs.oracle.com/javase/1.5.0/docs/api/java/lang/reflect/Method.html
 // http://docs.oracle.com/javase/1.5.0/docs/api/java/lang/Class.html
 
-void setup() {
+void introspect() {
   try {
-    String fullClassName = this.getClass().getName() + "$" + "Booper";
+    String fullClassName = this.getClass().getName(); // + "$" + "Booper";
     Class c = Class.forName(fullClassName);
     // println ( c.getMethods() );
    
@@ -931,8 +941,25 @@ void setup() {
     if (methods.length>0) {
       for (int i=0; i<methods.length; i++) {
         Method m = methods[i];
-        String t = m.getReturnType().toString();
-        println(i + ": "  + t);
+        String methodName = m.getName(); 
+        if (methodName.startsWith ("function_")){  
+          Type[] params = m.getGenericParameterTypes();
+          int nParams = params.length;
+          
+          print (i + ": "  + methodName + "\t");
+          print ("(" + nParams + ") "); 
+          for (int p=0; p<nParams; p++){
+            if (p != (nParams-1)){
+              print (params[p] + ", ");
+            } else {
+              println (params[p]); 
+            }
+          }
+
+        }
+        
+        // String t = m.getReturnType().toString();
+        // println(i + ": "  + t);
       }
     }
    
@@ -942,17 +969,5 @@ void setup() {
   }
 }
 
-void draw() {
-}
 
-class Booper {
-  float methodA (float a, float b) {
-    return (a+b);
-  }
-
-  float methodB (float a, float b, float c) {
-    return (a*b*c);
-  }
-}
-*/
 

@@ -521,6 +521,24 @@ float function_AdjustableSigmaGaussian (float x, float a) {
   return out;
 }
 
+//------------------------------------------------------------------
+float function_SlidingAdjustableSigmaGaussian (float x, float a, float b) {
+  // http://en.wikipedia.org/wiki/Gaussian_function
+
+  functionName = "Sliding Adjustable-Sigma Gaussian Window";
+  useParameterA = true;
+  useParameterB = true; 
+  useParameterC = useParameterD = useParameterN = false;
+  
+  x *= 2.0;
+  a *= 2.0; 
+  float sigma = a;
+  float dx = 2.0*(b - 0.5); 
+  float out = exp(0.0 - (sq(x-1.0 -dx) / (2.0*sigma*sigma))); 
+  return out;
+}
+
+
 
 
 //------------------------------------------------------------------

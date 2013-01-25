@@ -51,10 +51,10 @@ float function_CubicBezier (float x, float a, float b, float c, float d){
   float max_param_c = 1.0 - epsilon;
   float min_param_d = 0.0;
   float max_param_d = 1.0;
-  //a = constrain(a, min_param_a, max_param_a); 
-  //b = constrain(b, min_param_b, max_param_b); 
-  //c = constrain(c, min_param_c, max_param_c); 
-  //d = constrain(d, min_param_d, max_param_d); 
+  a = constrain(a, min_param_a, max_param_a); 
+  b = constrain(b, min_param_b, max_param_b); 
+  c = constrain(c, min_param_c, max_param_c); 
+  d = constrain(d, min_param_d, max_param_d); 
 
   //-------------------------------------------
   float y0a = 0.00; // initial y
@@ -84,7 +84,7 @@ float function_CubicBezier (float x, float a, float b, float c, float d){
     float currentx = xFromT (currentt, A,B,C,D); 
     float currentslope = slopeFromT (currentt, A,B,C);
     currentt -= (currentx - x)*(currentslope);
-    currentt = constrain(currentt, 0,1);
+    currentt = constrain(currentt, 0,1.0);
   } 
  
   //------------
