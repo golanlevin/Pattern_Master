@@ -15,8 +15,8 @@ float function_CircularFillet (float x, float a, float b, float c){
   functionName = "Double-Linear with Circular Fillet";
   useParameterA = true;
   useParameterB = true;
-  useParameterC = false;
-  useParameterD = true;
+  useParameterC = true;
+  useParameterD = false;
   useParameterN = false;
   
   float epsilon = 0.00001;

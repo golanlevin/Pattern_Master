@@ -1,7 +1,7 @@
 // A Flexible Quartic Equation
 
 //------------------------------------------------------------------
-float function_NiftyQuartic (float x, float a, float b){
+float function_NiftyQuartic (float x, float a, float b) {
   functionName = "Quartic";
   useParameterA = true;
   useParameterB = true;
@@ -20,27 +20,28 @@ float function_NiftyQuartic (float x, float a, float b){
   float w = (1-2*a)*(x*x) + (2*a)*x;
   float y = (1-2*b)*(w*w) + (2*b)*w;
   return y;
-
 }
 
 
-float function_Identity (float x){
-    functionName = "Identity Function";
+float function_Identity (float x) {
+  functionName = "Identity Function";
   useParameterA = false;
   useParameterB = false;
   useParameterC = false;
   useParameterD = false;
   useParameterN = false;
-   return x;
+  return x;
 }
 
 
-float function_Inverse (float x){
-    functionName = "Inverse Function";
+float function_Inverse (float x) {
+  functionName = "Inverse Function";
   useParameterA = false;
   useParameterB = false;
   useParameterC = false;
   useParameterD = false;
   useParameterN = false;
-   return 1.0-x;
+  return 1.0-x;
 }
+
+

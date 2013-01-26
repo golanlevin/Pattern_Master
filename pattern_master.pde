@@ -9,7 +9,8 @@
 // http://en.wikipedia.org/wiki/Generalised_logistic_function Richard's Curve
 // http://en.wikipedia.org/wiki/Probit_function
 // http://mathworld.wolfram.com/HeavisideStepFunction.html
-// introspection
+//
+// RESTORE MODE-SPECIFIC GRAPHICS!!!
 
 import java.lang.*;
 import java.lang.reflect.Method;
@@ -22,6 +23,7 @@ boolean bDrawProbe = true;
 boolean bDrawBlooper = true;
 boolean bDrawGrayScale = true;
 boolean bDrawNoiseHistories = true; 
+boolean bDrawModeSpecificGraphics = false;
 
 color boundingBoxStrokeColor = color(180); 
 
@@ -56,6 +58,8 @@ String functionName = "";
 
 float noiseRawHistory[]; 
 float noiseFilteredHistory[];
+float sineRawHistory[]; 
+float sineFilteredHistory[];
 
 int FUNCTIONMODE = 0;
 int NFUNCTIONS = 101; //!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -78,17 +82,20 @@ void keyPressed() {
 //-----------------------------------------------------
 void setup() {
   int scrW = (int)(margin0 + bandTh + margin1 + xscale + margin0);
-  int scrH = (int)(margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin0 );
+  int scrH = (int)(margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin0 + bandTh + margin1);
   size (scrW, scrH);// OPENGL);
   // println("App dimensions: " + scrW + " x " + scrH);
 
-  noiseRawHistory = new float[(int)xscale];
+  noiseRawHistory      = new float[(int)xscale];
   noiseFilteredHistory = new float[(int)xscale];
+  sineRawHistory       = new float[(int)xscale];
+  sineFilteredHistory  = new float[(int)xscale];
   for (int i=0; i<xscale; i++) {
     noiseFilteredHistory[i] = noiseRawHistory[i] = 0.5;
+    sineFilteredHistory[i]  = sineRawHistory[i]  = 0.5;
   }
-  
-  introspect(); 
+
+  introspect();
 }
 
 //-----------------------------------------------------
@@ -216,7 +223,7 @@ void drawPDF() {
 
 //-----------------------------------------------------
 void draw() {
-  
+
   updateParameters(); 
 
   if (doSavePDF) {
@@ -224,9 +231,9 @@ void draw() {
     doSavePDF = false;
   }  
   else {
-    
+
     background (255);
-    
+
     //---------------------------
     // Draw the animating probe
     if (bDrawProbe) {
@@ -241,7 +248,9 @@ void draw() {
 
     //---------------------------
     // extra mode-specific graphics for Bezier
-    drawModeSpecificGraphics();
+    if (bDrawModeSpecificGraphics) {
+      drawModeSpecificGraphics();
+    }
 
     //---------------------------
     // draw the function's curve
@@ -266,8 +275,8 @@ void draw() {
 }
 
 //-----------------------------------------------------
-void updateParameters(){
-  
+void updateParameters() {
+
   probe_x =  (abs(millis()%2000-1000))/1000.0;
   if (mousePressed && bClickedInGraph) {
     if (visited) {
@@ -296,6 +305,7 @@ void drawMainFunctionCurve() {
   float px, py;
   float qx, qy;
 
+  noFill(); 
   stroke(boundingBoxStrokeColor);
   rect(xoffset, yoffset, xscale, yscale);
 
@@ -330,7 +340,7 @@ void drawAnimatingProbe() {
   // inspired by @marcinignac & @soulwire 
   // http://codepen.io/vorg/full/Aqyre 
 
-  float x = constrain(probe_x, 0, 1);
+    float x = constrain(probe_x, 0, 1);
   float y = probe_y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
   float px = xoffset + round(xscale * x);
   float py = yoffset + round(yscale * y);
@@ -395,17 +405,28 @@ void drawGrayLevels() {
 //-----------------------------------------------------
 void drawNoiseHistories() {
 
+  float nhy = margin0 + bandTh + margin1 + yscale + margin2;
+  float shy = margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin1;
   int nData = (int)xscale; 
+
+  // update noise history
   for (int i=0; i<(nData-1); i++) {
     noiseRawHistory[i] = noiseRawHistory[i+1];
   }
-  noiseRawHistory[nData-1] = noise(millis()/(nData/2.0)); 
-  float nhy = margin0 + bandTh + margin1 + yscale + margin2;
+  noiseRawHistory[nData-1] = noise(millis()/ (nData/2.0)); 
 
-  // draw bounding rectangle
+  // update sine history
+  for (int i=0; i<(nData-1); i++) {
+    sineRawHistory[i] = sineRawHistory[i+1];
+  }
+  sineRawHistory[nData-1] = 0.50 + 0.45 * sin(millis()/ (nData/2.0));  
+  
+
+  // draw bounding rectangles
   noFill(); 
   stroke(boundingBoxStrokeColor);
   rect (xoffset, nhy, xscale, bandTh);
+  rect (xoffset, shy, xscale, bandTh);
 
   // draw raw noise history
   noFill(); 
@@ -419,7 +440,6 @@ void drawNoiseHistories() {
   }
   endShape(); 
 
-
   // draw filtered noise history
   noFill(); 
   stroke(0); 
@@ -430,6 +450,33 @@ void drawNoiseHistories() {
     float valFiltered = 1.0 - function (valRaw, param_a, param_b, param_c, param_d, param_n);
     valFiltered = constrain(valFiltered, 0, 1); 
     float y = nhy + bandTh * valFiltered;
+    vertex(x, y);
+  }
+  endShape();
+
+  //----------------
+  // draw raw sine history
+  noFill(); 
+  stroke(180); 
+  beginShape(); 
+  for (int i=0; i<nData; i++) {
+    float x = xoffset + i;
+    float valRaw = 1.0 - constrain(sineRawHistory[i], 0, 1);
+    float y = shy + bandTh * valRaw;
+    vertex(x, y);
+  }
+  endShape(); 
+
+  // draw filtered sine history
+  noFill(); 
+  stroke(0); 
+  beginShape(); 
+  for (int i=0; i<nData; i++) {
+    float x = xoffset + i;
+    float valRaw = sineRawHistory[i];
+    float valFiltered = 1.0 - function (valRaw, param_a, param_b, param_c, param_d, param_n);
+    valFiltered = constrain(valFiltered, 0, 1); 
+    float y = shy + bandTh * valFiltered;
     vertex(x, y);
   }
   endShape();
@@ -573,9 +620,99 @@ void drawModeSpecificGraphics() {
   }
 }
 
-
 //===============================================================
 float function (float x, float a, float b, float c, float d, int n) {
+  float out = 0; 
+  nFunctionMethods = functionMethodArraylist.size(); 
+  if (nFunctionMethods > 0) {
+    int whichFunction = FUNCTIONMODE%nFunctionMethods;  
+    Method whichMethod = functionMethodArraylist.get(whichFunction); 
+
+    Type[] params = whichMethod.getGenericParameterTypes();
+    int nParams = params.length;
+
+    // determine if the current function has an integer argument.
+    boolean bHasIntegerArgument = false;
+    for (int p=0; p<nParams; p++) {
+      String paramString = params[p].toString();
+      if (paramString.equals("int")){
+        bHasIntegerArgument = true;
+      }
+    }
+
+    // invoke the current shaping function, 
+    // with the correct number and type of arguments. 
+    try {
+      Float F;
+      switch(nParams) {
+        
+      case 1: 
+        F = (Float) whichMethod.invoke(this, x);
+        out = F.floatValue();
+        break;
+        
+      case 2: 
+        if (bHasIntegerArgument){
+          F = (Float) whichMethod.invoke(this, x, n);
+        } else {
+          F = (Float) whichMethod.invoke(this, x, a);
+        }
+        out = F.floatValue();
+        break;
+        
+      case 3: 
+        if (bHasIntegerArgument){
+          F = (Float) whichMethod.invoke(this, x, a, n);
+        } else {
+          F = (Float) whichMethod.invoke(this, x, a, b);
+        }
+        out = F.floatValue();
+        break;
+        
+      case 4: 
+        if (bHasIntegerArgument){
+          F = (Float) whichMethod.invoke(this, x, a, b, n);
+        } else {
+          F = (Float) whichMethod.invoke(this, x, a, b, c);
+        }
+        out = F.floatValue();
+        break;
+        
+      case 5: 
+        if (bHasIntegerArgument){
+          F = (Float) whichMethod.invoke(this, x, a, b, c, n);
+        } else {
+          F = (Float) whichMethod.invoke(this, x, a, b, c, d);
+        }
+        out = F.floatValue();
+        break;
+        
+      case 6: 
+        if (bHasIntegerArgument){
+          F = (Float) whichMethod.invoke(this, x, a, b, c, d, n);
+          out = F.floatValue();
+        } 
+        
+        break;
+      }
+    } 
+
+    catch (Exception e) {
+      // Paranoid much? Print out what went wrong.
+      println(e +  ": " + e.getMessage() );
+      e.printStackTrace(); 
+      Throwable cause = e.getCause();
+      println (cause.getMessage());
+    }
+  }
+  return out;
+}
+
+
+//===============================================================
+float functionOLD (float x, float a, float b, float c, float d, int n) {
+  // This method is about to be deleted. 
+  
   float out = 0;
   switch (FUNCTIONMODE) {
 
@@ -910,7 +1047,6 @@ float function (float x, float a, float b, float c, float d, int n) {
   case 100: 
     out = function_SlidingAdjustableSigmaGaussian (x, a, b); 
     break;
-    
   }
   return out;
 }
@@ -921,53 +1057,49 @@ float function (float x, float a, float b, float c, float d, int n) {
 
 ///////////////////////////////////////////////////////////
 // Notes for introspection implementation (TO DO)
-
-
-
 // import java.lang.*;
 // import java.lang.reflect.Method;
 // import java.lang.reflect.Type;
 // http://docs.oracle.com/javase/1.5.0/docs/api/java/lang/Object.html
 // http://docs.oracle.com/javase/1.5.0/docs/api/java/lang/reflect/Method.html
 // http://docs.oracle.com/javase/1.5.0/docs/api/java/lang/Class.html
+// Method.invoke // Object   invoke(Object obj, Object... args) 
+// String rts = m.getReturnType().toString(); // assumed to be float
+
+ArrayList<Method> functionMethodArraylist; 
+int nFunctionMethods;
 
 void introspect() {
+  
+  // compile an ArrayList containing all the shaper functions. 
+  functionMethodArraylist = new ArrayList<Method>();
+  nFunctionMethods = 0; 
+
   try {
     String fullClassName = this.getClass().getName(); // + "$" + "Booper";
-    Class c = Class.forName(fullClassName);
-    // println ( c.getMethods() );
-   
-    Method[] methods = c.getMethods();
+    Class myClassName = Class.forName(fullClassName);
+
+    int funcCount = 0; 
+    Method[] methods = myClassName.getMethods();
+
     if (methods.length>0) {
+      // count (specifically) the shaper functions.
+      // copy into local arraylist data structure
       for (int i=0; i<methods.length; i++) {
         Method m = methods[i];
         String methodName = m.getName(); 
-        if (methodName.startsWith ("function_")){  
-          Type[] params = m.getGenericParameterTypes();
-          int nParams = params.length;
-          
-          print (i + ": "  + methodName + "\t");
-          print ("(" + nParams + ") "); 
-          for (int p=0; p<nParams; p++){
-            if (p != (nParams-1)){
-              print (params[p] + ", ");
-            } else {
-              println (params[p]); 
-            }
-          }
-
+        if (methodName.startsWith ("function_")) { 
+          funcCount++;
+          functionMethodArraylist.add(m);
         }
-        
-        // String t = m.getReturnType().toString();
-        // println(i + ": "  + t);
       }
+      nFunctionMethods = functionMethodArraylist.size(); 
+      println("nFunctionMethods = " + nFunctionMethods); 
+
     }
-   
   }
   catch (Exception e) {
     println (e);
   }
 }
-
-
 
