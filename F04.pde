@@ -1,7 +1,7 @@
 // Double-Elliptic Seat and Double-Circular Seat
 
 //------------------------------------------------------------------
-float function_DoubleEllipticSeat (float x, float a, float b, int n){
+float function_DoubleEllipticSeat (float x, float a, float b){
   functionName = "Double-Elliptic Seat";
   useParameterA = true;
   useParameterB = true;

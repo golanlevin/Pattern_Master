@@ -23,7 +23,7 @@ boolean bDrawProbe = true;
 boolean bDrawBlooper = true;
 boolean bDrawGrayScale = true;
 boolean bDrawNoiseHistories = true; 
-boolean bDrawModeSpecificGraphics = false;
+boolean bDrawModeSpecificGraphics = true;
 
 color boundingBoxStrokeColor = color(180); 
 
@@ -366,15 +366,20 @@ void drawAnimatingProbe() {
 //-----------------------------------------------------
 void drawAnimatingBlooper() {
   // draw the animating circle, inspired by @marcinignac & @soulwire 
-  // http://codepen.io/vorg/full/Aqyre 
-
-  noStroke(); 
-  smooth(); 
-  fill (160);
+  // http://codepen.io/vorg/full/Aqyre   
 
   float blooperCx = margin0+bandTh/2.0;
   float blooperCy = margin0+bandTh/2.0;
-  float blooperR = bandTh * function (probe_x, param_a, param_b, param_c, param_d, param_n);
+  float val = function (probe_x, param_a, param_b, param_c, param_d, param_n);
+  float blooperR = bandTh * val;
+
+  smooth(); 
+  float gray = map(val, 0, 1, 220, 255);
+  fill (gray); 
+  ellipse (blooperCx, blooperCy, bandTh, bandTh);
+
+  noStroke();
+  fill (160);
   ellipse (blooperCx, blooperCy, blooperR, blooperR);
 }
 
@@ -420,7 +425,7 @@ void drawNoiseHistories() {
     sineRawHistory[i] = sineRawHistory[i+1];
   }
   sineRawHistory[nData-1] = 0.50 + 0.45 * sin(millis()/ (nData/2.0));  
-  
+
 
   // draw bounding rectangles
   noFill(); 
@@ -535,8 +540,147 @@ void drawLabels() {
   }
 }
 
-//===============================================================
 void drawModeSpecificGraphics() {
+
+  int whichFunction = FUNCTIONMODE%nFunctionMethods;  
+  Method whichMethod = functionMethodArraylist.get(whichFunction); 
+  String methodName = whichMethod.getName(); 
+
+  Type[] params = whichMethod.getGenericParameterTypes();
+  int nParams = params.length;
+
+  // determine if the current function has an integer argument.
+  String lastParamString = params[nParams-1].toString();
+  boolean bHasIntegerArgument = (lastParamString.equals("int"));
+
+  float x, y;
+  float xa, yb;
+  float xc, yd;
+  float K = 12;
+
+  noFill();
+  stroke(180, 180, 255);
+
+  switch (nParams) {
+  case 3:
+    if (bHasIntegerArgument == false) {
+      // through a point
+      x = xoffset + param_a * xscale;
+      y = yoffset + (1-param_b) * yscale;
+      line(x-K, y, x+K, y); 
+      line(x, y-K, x, y+K);
+    }
+    break;
+
+  
+  }
+
+
+
+  /*
+  "function_AdjustableFwhmHalfGaussian"
+   "function_AdjustableSigmaHalfGaussian"
+   "function_DoubleLinear"
+   "function_DoubleCircleSeat"
+   "function_DoubleEllipticSeat"
+   "function_DoubleCubicSeat"
+   "function_DoubleCubicSeatSimplified"
+   "function_DoubleOddPolynomialSeat"
+   "function_DoubleExponentialSeat"
+   "function_DoubleCircleSigmoid"
+   "function_DoubleEllipticSigmoid"
+   "function_RaisedInvertedCosine"
+   "function_BlinnWyvillCosineApproximation"
+   "function_DoubleQuadraticSigmoid"
+   "function_DoublePolynomialSigmoid"
+   "function_DoubleExponentialSigmoid"
+   "function_ExponentialEmphasis"
+   "function_NiftyQuartic"
+   "function_NormalizedLogisticSigmoid"
+   "function_CircularFillet"
+   "function_CircularArcThroughAPoint"
+   "function_CubicBezierThrough2Points"
+   "function_ParabolaThroughAPoint"
+   "function_QuadraticBezier"
+   "function_CubicBezier"
+   "function_Identity"
+   "function_CircularEaseIn"
+   "function_CircularEaseOut"
+   "function_SmoothStep"
+   "function_SmootherStep"
+   "function_MaclaurinCos"
+   "function_CatmullRomInterpolate"
+   "function_HermiteAdvanced"
+   "function_NormalizedErf"
+   "function_NormalizedInverseErf"
+   "function_SimpleHalfGaussian"
+   "function_HalfGaussianThroughAPoint"
+   "function_PennerEaseInBack"
+   "function_PennerEaseOutBack"
+   "function_PennerEaseInOutBack"
+   "function_CircularEaseInOut"
+   "function_PennerEaseInQuadratic"
+   "function_PennerEaseOutQuadratic"
+   "function_PennerEaseInOutQuadratic"
+   "function_PennerEaseInCubic"
+   "function_PennerEaseOutCubic"
+   "function_PennerEaseInOutCubic"
+   "function_PennerEaseInQuartic"
+   "function_PennerEaseOutQuartic"
+   "function_PennerEaseInOutQuartic"
+   "function_PennerEaseInQuintic"
+   "function_PennerEaseOutQuintic"
+   "function_PennerEaseInOutQuintic"
+   "function_PennerEaseInElastic"
+   "function_PennerEaseOutElastic"
+   "function_PennerEaseInOutElastic"
+   "function_PennerEaseInExpo"
+   "function_PennerEaseOutExpo"
+   "function_PennerEaseInOutExpo"
+   "function_PennerEaseInSine"
+   "function_PennerEaseOutSine"
+   "function_PennerEaseInOutSine"
+   "function_PennerEaseInBounce"
+   "function_PennerEaseOutBounce"
+   "function_PennerEaseInOutBounce"
+   "function_HalfLanczosSincWindow"
+   "function_HalfNuttallWindow"
+   "function_HalfBlackmanNuttallWindow"
+   "function_HalfBlackmanHarrisWindow"
+   "function_HalfExactBlackmanWindow"
+   "function_HalfGeneralizedBlackmanWindow"
+   "function_HalfFlatTopWindow"
+   "function_HalfBartlettHannWindow"
+   "function_BartlettWindow"
+   "function_CosineWindow"
+   "function_TukeyWindow"
+   "function_AdjustableSigmaGaussian"
+   "function_LanczosSincWindow"
+   "function_NuttallWindow"
+   "function_BlackmanNuttallWindow"
+   "function_BlackmanHarrisWindow"
+   "function_ExactBlackmanWindow"
+   "function_GeneralizedBlackmanWindow"
+   "function_FlatTopWindow"
+   "function_BartlettHannWindow"
+   "function_HannWindow"
+   "function_HammingWindow"
+   "function_Staircase"
+   "function_Gompertz"
+   "function_NormalizedLogit"
+   "function_GeneralSigmoidLogitCombo"
+   "function_GeneralizedLinearMap"
+   "function_AdjustableCenterCosineWindow"
+   "function_AdjustableCenterEllipticWindow"
+   "function_ExponentialSmoothedStaircase"
+   "function_Inverse"
+   "function_SlidingAdjustableSigmaGaussian"
+   "function_Hermite"
+   */
+}
+
+//===============================================================
+void drawModeSpecificGraphicsOLD() {
   float x, y;
   float xa, yb;
   float xc, yd;
@@ -635,7 +779,7 @@ float function (float x, float a, float b, float c, float d, int n) {
     boolean bHasIntegerArgument = false;
     for (int p=0; p<nParams; p++) {
       String paramString = params[p].toString();
-      if (paramString.equals("int")){
+      if (paramString.equals("int")) {
         bHasIntegerArgument = true;
       }
     }
@@ -645,54 +789,58 @@ float function (float x, float a, float b, float c, float d, int n) {
     try {
       Float F;
       switch(nParams) {
-        
+
       case 1: 
         F = (Float) whichMethod.invoke(this, x);
         out = F.floatValue();
         break;
-        
+
       case 2: 
-        if (bHasIntegerArgument){
+        if (bHasIntegerArgument) {
           F = (Float) whichMethod.invoke(this, x, n);
-        } else {
+        } 
+        else {
           F = (Float) whichMethod.invoke(this, x, a);
         }
         out = F.floatValue();
         break;
-        
+
       case 3: 
-        if (bHasIntegerArgument){
+        if (bHasIntegerArgument) {
           F = (Float) whichMethod.invoke(this, x, a, n);
-        } else {
+        } 
+        else {
           F = (Float) whichMethod.invoke(this, x, a, b);
         }
         out = F.floatValue();
         break;
-        
+
       case 4: 
-        if (bHasIntegerArgument){
+        if (bHasIntegerArgument) {
           F = (Float) whichMethod.invoke(this, x, a, b, n);
-        } else {
+        } 
+        else {
           F = (Float) whichMethod.invoke(this, x, a, b, c);
         }
         out = F.floatValue();
         break;
-        
+
       case 5: 
-        if (bHasIntegerArgument){
+        if (bHasIntegerArgument) {
           F = (Float) whichMethod.invoke(this, x, a, b, c, n);
-        } else {
+        } 
+        else {
           F = (Float) whichMethod.invoke(this, x, a, b, c, d);
         }
         out = F.floatValue();
         break;
-        
+
       case 6: 
-        if (bHasIntegerArgument){
+        if (bHasIntegerArgument) {
           F = (Float) whichMethod.invoke(this, x, a, b, c, d, n);
           out = F.floatValue();
         } 
-        
+
         break;
       }
     } 
@@ -712,7 +860,7 @@ float function (float x, float a, float b, float c, float d, int n) {
 //===============================================================
 float functionOLD (float x, float a, float b, float c, float d, int n) {
   // This method is about to be deleted. 
-  
+
   float out = 0;
   switch (FUNCTIONMODE) {
 
@@ -724,7 +872,7 @@ float functionOLD (float x, float a, float b, float c, float d, int n) {
     out = function_DoubleCircleSeat (x, a); 
     break;
   case 2:
-    out = function_DoubleEllipticSeat (x, a, b, n); 
+    out = function_DoubleEllipticSeat (x, a, b); 
     break;
   case 3:
     out = function_DoubleCubicSeat (x, a, b);
@@ -1070,7 +1218,7 @@ ArrayList<Method> functionMethodArraylist;
 int nFunctionMethods;
 
 void introspect() {
-  
+
   // compile an ArrayList containing all the shaper functions. 
   functionMethodArraylist = new ArrayList<Method>();
   nFunctionMethods = 0; 
@@ -1089,13 +1237,13 @@ void introspect() {
         Method m = methods[i];
         String methodName = m.getName(); 
         if (methodName.startsWith ("function_")) { 
+          println ('"' + methodName + '"'); 
           funcCount++;
           functionMethodArraylist.add(m);
         }
       }
       nFunctionMethods = functionMethodArraylist.size(); 
-      println("nFunctionMethods = " + nFunctionMethods); 
-
+      println("nFunctionMethods = " + nFunctionMethods);
     }
   }
   catch (Exception e) {
