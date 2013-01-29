@@ -263,7 +263,7 @@ float function_PennerEaseInOutElastic (float t) {
 
 
 //------------------------------------------------------------------
-float function_PennerEaseOutBounce(float t) {
+float function_PennerEaseOutBounce (float t) {
   functionName = "Penner's EaseOut Bounce";
   useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
 

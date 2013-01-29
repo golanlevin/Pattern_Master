@@ -12,18 +12,20 @@
 //
 // RESTORE MODE-SPECIFIC GRAPHICS!!!
 
+// Imports for introspection, so we know the functions' arguments. 
 import java.lang.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+// Imports for PDF, to save a vector graphic of the function.
 import processing.pdf.*;
 boolean doSavePDF=false;
 
 boolean bDrawProbe = true;
-boolean bDrawBlooper = true;
 boolean bDrawGrayScale = true;
 boolean bDrawNoiseHistories = true; 
 boolean bDrawModeSpecificGraphics = true;
+boolean bDrawAnimatingRadiusCircle = true;
 
 color boundingBoxStrokeColor = color(180); 
 
@@ -41,10 +43,11 @@ float param_a = 0.25;
 float param_b = 0.75;
 float param_c = 0.75;
 float param_d = 0.25;
-int   param_n = 2;
+int   param_n = 3;
 
 float probe_x = 0.5;
 float probe_y = 0.5;
+float animationConstant = 1000.0;
 
 boolean useParameterA = true;
 boolean useParameterB = true;
@@ -132,7 +135,6 @@ void mouseReleased() {
 //====================================================
 void drawPDF() {
 
-
   String pdfFilename = functionName;
   if (useParameterA) { 
     pdfFilename += "_a=" + nf(param_a, 1, 2);
@@ -190,7 +192,6 @@ void drawPDF() {
   }
   endShape();
 
-
   //---------------------------
   // draw the function's gray levels
   py = yoffset-(bandTh+margin1);
@@ -212,7 +213,6 @@ void drawPDF() {
   noFill();
   stroke(128);
   rect(xoffset, yoffset-(bandTh+margin1), xscale, bandTh);
-
 
   endRecord();
   strokeWeight (1); 
@@ -239,21 +239,18 @@ void draw() {
     if (bDrawProbe) {
       drawAnimatingProbe();
     }
-
     //---------------------------
     // Draw the animating circle 
-    if (bDrawBlooper) {
-      drawAnimatingBlooper();
+    if (bDrawAnimatingRadiusCircle) {
+      drawAnimatingRadiusCircle();
     }
-
     //---------------------------
-    // extra mode-specific graphics for Bezier
+    // Extra mode-specific graphics for Bezier, etc.
     if (bDrawModeSpecificGraphics) {
       drawModeSpecificGraphics();
     }
-
     //---------------------------
-    // draw the function's curve
+    // Draw the function's curve
     drawMainFunctionCurve();
 
     //---------------------------
@@ -261,13 +258,11 @@ void draw() {
     if (bDrawGrayScale) {
       drawGrayLevels();
     }
-
     //---------------------------
     // Draw a noise signal, and a filtered version.
     if (bDrawNoiseHistories) {
       drawNoiseHistories();
     }
-
     //---------------------------
     // Draw labels
     drawLabels();
@@ -277,10 +272,11 @@ void draw() {
 //-----------------------------------------------------
 void updateParameters() {
 
-  probe_x =  (abs(millis()%2000-1000))/1000.0;
+  float acf = animationConstant;
+  probe_x = abs(millis()%(2*(int)acf) - acf)/acf;
+
   if (mousePressed && bClickedInGraph) {
     if (visited) {
-
       if (whichButton == 1) {
         param_a =   (float)(mouseX - xoffset)/xscale;
         param_b = 1-(float)(mouseY - yoffset)/yscale;
@@ -294,8 +290,7 @@ void updateParameters() {
         param_d = constrain(param_d, 0, 1);
       }
     }
-  } 
-  param_n = 2;
+  }
 }
 
 
@@ -338,7 +333,7 @@ void drawMainFunctionCurve() {
 void drawAnimatingProbe() {
 
   // inspired by @marcinignac & @soulwire 
-  // http://codepen.io/vorg/full/Aqyre 
+  // from http://codepen.io/vorg/full/Aqyre 
 
     float x = constrain(probe_x, 0, 1);
   float y = probe_y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
@@ -364,9 +359,9 @@ void drawAnimatingProbe() {
 
 
 //-----------------------------------------------------
-void drawAnimatingBlooper() {
-  // draw the animating circle, inspired by @marcinignac & @soulwire 
-  // http://codepen.io/vorg/full/Aqyre   
+void drawAnimatingRadiusCircle() {
+  // Draw a circle whose radius is linked to the function value. 
+  // Inspired by @marcinignac & @soulwire: http://codepen.io/vorg/full/Aqyre   
 
   float blooperCx = margin0+bandTh/2.0;
   float blooperCy = margin0+bandTh/2.0;
@@ -374,12 +369,14 @@ void drawAnimatingBlooper() {
   float blooperR = bandTh * val;
 
   smooth(); 
-  float gray = map(val, 0, 1, 220, 255);
-  fill (gray); 
+  float grayBg = map(val, 0, 1, 220, 255);
+  fill (grayBg); 
   ellipse (blooperCx, blooperCy, bandTh, bandTh);
 
   noStroke();
   fill (160);
+  float grayFg = map(val, 0, 1, 127, 160);
+  fill (grayFg);
   ellipse (blooperCx, blooperCy, blooperR, blooperR);
 }
 
@@ -424,7 +421,7 @@ void drawNoiseHistories() {
   for (int i=0; i<(nData-1); i++) {
     sineRawHistory[i] = sineRawHistory[i+1];
   }
-  sineRawHistory[nData-1] = 0.50 + 0.45 * sin(millis()/ (nData/2.0));  
+  sineRawHistory[nData-1] = 0.5 + (0.45 * cos(PI * millis()/animationConstant));   
 
 
   // draw bounding rectangles
@@ -571,8 +568,6 @@ void drawModeSpecificGraphics() {
       line(x, y-K, x, y+K);
     }
     break;
-
-  
   }
 
 
@@ -776,455 +771,460 @@ float function (float x, float a, float b, float c, float d, int n) {
     int nParams = params.length;
 
     // determine if the current function has an integer argument.
-    boolean bHasIntegerArgument = false;
+    boolean bHasFinalIntegerArgument = false;
     for (int p=0; p<nParams; p++) {
       String paramString = params[p].toString();
       if (paramString.equals("int")) {
-        bHasIntegerArgument = true;
+        bHasFinalIntegerArgument = true;
       }
     }
 
-    // invoke the current shaping function, 
-    // with the correct number and type of arguments. 
+    // Invoke() the current shaping function, 
+    // with the correct number and type(s) of arguments. 
+    // Note: we don't have any 1-argument functions with an integer arg.
+    // Note: we don't have any 6-argument functions without an integer arg.
     try {
-      Float F;
-      switch(nParams) {
+      Float F = 0.0;
 
-      case 1: 
-        F = (Float) whichMethod.invoke(this, x);
-        out = F.floatValue();
-        break;
-
-      case 2: 
-        if (bHasIntegerArgument) {
+      if (bHasFinalIntegerArgument) {
+        switch(nParams) {
+        case 2: 
           F = (Float) whichMethod.invoke(this, x, n);
-        } 
-        else {
-          F = (Float) whichMethod.invoke(this, x, a);
-        }
-        out = F.floatValue();
-        break;
+          break;
 
-      case 3: 
-        if (bHasIntegerArgument) {
+        case 3: 
           F = (Float) whichMethod.invoke(this, x, a, n);
-        } 
-        else {
-          F = (Float) whichMethod.invoke(this, x, a, b);
-        }
-        out = F.floatValue();
-        break;
+          break;
 
-      case 4: 
-        if (bHasIntegerArgument) {
+        case 4: 
           F = (Float) whichMethod.invoke(this, x, a, b, n);
-        } 
-        else {
-          F = (Float) whichMethod.invoke(this, x, a, b, c);
-        }
-        out = F.floatValue();
-        break;
+          break;
 
-      case 5: 
-        if (bHasIntegerArgument) {
+        case 5: 
           F = (Float) whichMethod.invoke(this, x, a, b, c, n);
-        } 
-        else {
-          F = (Float) whichMethod.invoke(this, x, a, b, c, d);
-        }
-        out = F.floatValue();
-        break;
+          break;
 
-      case 6: 
-        if (bHasIntegerArgument) {
+        case 6: 
           F = (Float) whichMethod.invoke(this, x, a, b, c, d, n);
-          out = F.floatValue();
-        } 
-
-        break;
+          break;
+        }
       }
+
+      else if (bHasFinalIntegerArgument == false) {
+        switch(nParams) {
+        case 1: 
+          F = (Float) whichMethod.invoke(this, x); 
+          break;
+
+        case 2: 
+          F = (Float) whichMethod.invoke(this, x, a);
+          break;
+
+        case 3: 
+          F = (Float) whichMethod.invoke(this, x, a, b);
+          break;
+
+        case 4: 
+          F = (Float) whichMethod.invoke(this, x, a, b, c);
+          break;
+
+        case 5: 
+          F = (Float) whichMethod.invoke(this, x, a, b, c, d);
+          break;
+        }
+      }
+      out = F.floatValue();
     } 
 
     catch (Exception e) {
-      // Paranoid much? Print out what went wrong.
+      // Print out what went wrong.
+      println("Problem calling method: " + whichMethod.getName());
       println(e +  ": " + e.getMessage() );
       e.printStackTrace(); 
       Throwable cause = e.getCause();
       println (cause.getMessage());
     }
   }
+
   return out;
 }
 
+/*
+// For reference: this is how our old dispatcher was structured, before introspection.
+ float functionOLD (float x, float a, float b, float c, float d, int n) {
+ float out = 0;
+ switch (FUNCTIONMODE) {
+ case 0: // etcetera etcetera
+ out = function_DoubleLinear (x, a, b);  
+ break;
+ } 
+ return out;
+ }
+ */
 
-//===============================================================
-float functionOLD (float x, float a, float b, float c, float d, int n) {
-  // This method is about to be deleted. 
-
-  float out = 0;
-  switch (FUNCTIONMODE) {
-
-
-  case 0:  
-    out = function_DoubleLinear (x, a, b);  
-    break;
-  case 1:
-    out = function_DoubleCircleSeat (x, a); 
-    break;
+/*
   case 2:
-    out = function_DoubleEllipticSeat (x, a, b); 
-    break;
-  case 3:
-    out = function_DoubleCubicSeat (x, a, b);
-    break;
-  case 4: 
-    out = function_DoubleCubicSeatSimplified (x, a, b);
-    break;
-  case 5: 
-    out = function_DoubleOddPolynomialSeat (x, a, b, n);   
-    break;
-  case 6:
-    out = function_DoubleExponentialSeat (x, a);
-    break;
-  case 7:
-    out = function_DoubleCircleSigmoid (x, a);
-    break;
-  case 8: 
-    out = function_DoubleEllipticSigmoid (x, a, b);
-    break;
-  case 9: 
-    out = function_RaisedInvertedCosine (x);
-    break;
-  case 10: 
-    out = function_BlinnWyvillCosineApproximation (x);
-    break;
-  case 11:
-    out = function_DoubleQuadraticSigmoid (x);
-    break;
-  case 12:
-    out = function_DoublePolynomialSigmoid  (x, a, b, n);
-    break;
-  case 13:
-    out = function_DoubleExponentialSigmoid (x, a);
-    break;
-  case 14:
-    out = function_ExponentialEmphasis (x, a);
-    break;
-  case 15:
-    out = function_NiftyQuartic (x, a, b); 
-    break;
+ out = function_DoubleEllipticSeat (x, a, b); 
+ break;
+ case 3:
+ out = function_DoubleCubicSeat (x, a, b);
+ break;
+ case 4: 
+ out = function_DoubleCubicSeatSimplified (x, a, b);
+ break;
+ case 5: 
+ out = function_DoubleOddPolynomialSeat (x, a, b, n);   
+ break;
+ case 6:
+ out = function_DoubleExponentialSeat (x, a);
+ break;
+ case 7:
+ out = function_DoubleCircleSigmoid (x, a);
+ break;
+ case 8: 
+ out = function_DoubleEllipticSigmoid (x, a, b);
+ break;
+ case 9: 
+ out = function_RaisedInvertedCosine (x);
+ break;
+ case 10: 
+ out = function_BlinnWyvillCosineApproximation (x);
+ break;
+ case 11:
+ out = function_DoubleQuadraticSigmoid (x);
+ break;
+ case 12:
+ out = function_DoublePolynomialSigmoid  (x, a, b, n);
+ break;
+ case 13:
+ out = function_DoubleExponentialSigmoid (x, a);
+ break;
+ case 14:
+ out = function_ExponentialEmphasis (x, a);
+ break;
+ case 15:
+ out = function_NiftyQuartic (x, a, b); 
+ break;
+ 
+ case 16:
+ out = function_NormalizedLogisticSigmoid (x, a);  
+ break;
+ case 17:
+ out = function_CircularFillet (x, a, b, d);
+ break;
+ case 18:
+ out = function_CircularArcThroughAPoint (x, a, b);  
+ break;
+ 
+ case 19:
+ out = function_CubicBezierThrough2Points (x, a, b, c, d);
+ break;
+ case 20:
+ out = function_ParabolaThroughAPoint (x, a, b);
+ break;
+ case 21:
+ out = function_QuadraticBezier (x, a, b);
+ break;
+ case 22:
+ out = function_CubicBezier (x, a, b, c, d);
+ break;
+ case 23: 
+ out = function_Identity(x);
+ break;
+ case 24: 
+ out =  function_CircularEaseIn(x);
+ break;
+ case 25:
+ out =  function_CircularEaseOut(x);
+ break;
+ 
+ case 26:
+ out = function_SmoothStep(x); 
+ break;
+ case 27:
+ out = function_SmootherStep(x); 
+ break;
+ case 28:
+ out = function_MaclaurinCos(x); 
+ break;
+ 
+ case 29: 
+ out = function_CatmullRomInterpolate (x, a, b);
+ break;
+ case 30: 
+ out = function_HermiteAdvanced (x, a, b);
+ break;
+ case 31: 
+ out = function_NormalizedErf(x); 
+ break;
+ case 32:
+ out = function_NormalizedInverseErf(x); 
+ break;
+ 
+ case 33: 
+ out = function_SimpleHalfGaussian (x); 
+ break;
+ case 34: 
+ out = function_AdjustableFwhmHalfGaussian (x, a); 
+ break;
+ case 35: 
+ out = function_AdjustableSigmaHalfGaussian (x, a); 
+ break;
+ case 36:
+ out = function_HalfGaussianThroughAPoint (x, a, b); 
+ break;
+ 
+ case 37:
+ out = function_PennerEaseInBack (x); 
+ break;
+ case 38: 
+ out = function_PennerEaseOutBack (x); 
+ break; 
+ case 39:
+ out = function_PennerEaseInOutBack (x); 
+ break;
+ case 40: 
+ out = function_CircularEaseInOut (x);
+ break;
+ 
+ case 41: 
+ out = function_PennerEaseInQuadratic (x); 
+ break;
+ case 42: 
+ out = function_PennerEaseOutQuadratic (x); 
+ break; 
+ case 43: 
+ out = function_PennerEaseInOutQuadratic (x); 
+ break;  
+ 
+ case 44:
+ out = function_PennerEaseInCubic (x); 
+ break;
+ case 45:
+ out = function_PennerEaseOutCubic (x); 
+ break;
+ case 46: 
+ out = function_PennerEaseInOutCubic (x); 
+ break;
+ 
+ case 47: 
+ out = function_PennerEaseInQuartic (x); 
+ break;
+ case 48: 
+ out = function_PennerEaseOutQuartic (x); 
+ break;
+ case 49: 
+ out = function_PennerEaseInOutQuartic (x); 
+ break;
+ 
+ case 50: 
+ out = function_PennerEaseInQuintic (x); 
+ break; 
+ case 51: 
+ out = function_PennerEaseOutQuintic (x); 
+ break; 
+ case 52: 
+ out = function_PennerEaseInOutQuintic (x); 
+ break; 
+ 
+ case 53: 
+ out = function_PennerEaseInElastic (x); 
+ break;
+ case 54:
+ out = function_PennerEaseOutElastic (x); 
+ break;
+ case 55:
+ out = function_PennerEaseInOutElastic (x); 
+ break;
+ 
+ 
+ 
+ case 56: 
+ out = function_PennerEaseInExpo (x); 
+ break;
+ case 57: 
+ out = function_PennerEaseOutExpo (x); 
+ break;
+ case 58: 
+ out = function_PennerEaseInOutExpo (x); 
+ break;
+ 
+ case 59: 
+ out = function_PennerEaseInSine (x); 
+ break;
+ case 60: 
+ out = function_PennerEaseOutSine (x); 
+ break;
+ case 61: 
+ out = function_PennerEaseInOutSine (x); 
+ break;
+ 
+ 
+ case 62: 
+ out = function_PennerEaseInBounce (x); 
+ break;
+ case 63: 
+ out = function_PennerEaseOutBounce (x); 
+ break;
+ case 64: 
+ out = function_PennerEaseInOutBounce (x); 
+ break;
+ 
+ 
+ case 65: 
+ out = function_HalfLanczosSincWindow (x); 
+ break;
+ case 66:
+ out = function_HalfNuttallWindow (x); 
+ break;
+ case 67:
+ out = function_HalfBlackmanNuttallWindow (x); 
+ break;
+ case 68:
+ out = function_HalfBlackmanHarrisWindow (x); 
+ break;
+ case 69: 
+ out = function_HalfExactBlackmanWindow (x); 
+ break;
+ case 70:
+ out = function_HalfGeneralizedBlackmanWindow (x, a); 
+ break;
+ case 71: 
+ out = function_HalfFlatTopWindow (x); 
+ break;
+ case 72: 
+ out = function_HalfBartlettHannWindow (x); 
+ break;
+ 
+ case 73: 
+ out = function_BartlettWindow (x); 
+ break;
+ case 74: 
+ out = function_CosineWindow (x);
+ break;
+ case 75: 
+ out = function_TukeyWindow (x, a); 
+ break;
+ 
+ 
+ case 76: 
+ out = function_AdjustableSigmaGaussian (x, a); 
+ break;
+ case 77: 
+ out = function_LanczosSincWindow (x); 
+ break;
+ case 78: 
+ out = function_NuttallWindow (x); 
+ break;
+ case 79: 
+ out = function_BlackmanNuttallWindow (x); 
+ break;
+ case 80: 
+ out = function_BlackmanHarrisWindow (x); 
+ break;
+ case 81: 
+ out = function_ExactBlackmanWindow (x); 
+ break;
+ case 82: 
+ out = function_GeneralizedBlackmanWindow (x, a); 
+ break;
+ case 83: 
+ out = function_FlatTopWindow (x); 
+ break;
+ case 84: 
+ out = function_BartlettHannWindow (x); 
+ break;
+ case 85: 
+ out = function_HannWindow (x); 
+ break;  
+ case 86: 
+ out = function_HammingWindow (x); 
+ break;
+ case 87: 
+ out = functionGeneralizedTriangleWindow (x, a); 
+ break;
+ case 88: 
+ out = functionPoissonWindow (x, a); 
+ break;
+ case 89: 
+ out = functionHannPoissonWindow (x, a); 
+ break;
+ case 90: 
+ param_n = 7;
+ out = function_Staircase (x, param_n); 
+ break;
+ case 91: 
+ out = function_Gompertz (x, a); 
+ break;
+ 
+ case 92: 
+ out = function_NormalizedLogit (x, a); 
+ break;
+ case 93: 
+ out = function_NormalizedLogisticSigmoid (x, a); 
+ break;
+ case 94: 
+ out = function_GeneralSigmoidLogitCombo (x, a, b); 
+ break;  
+ 
+ case 95: 
+ out = function_GeneralizedLinearMap (x, a, b, c, d);
+ break;
+ case 96:
+ out = function_AdjustableCenterCosineWindow (x, a);
+ break;
+ case 97: 
+ out = function_AdjustableCenterEllipticWindow (x, a);
+ break;
+ case 98: 
+ param_n = 7;
+ out = function_ExponentialSmoothedStaircase (x, a, param_n);
+ break;
+ 
+ case 99: 
+ out = function_Inverse (x); 
+ break;
+ case 100: 
+ out = function_SlidingAdjustableSigmaGaussian (x, a, b); 
+ break;
+ }
+ return out;
+ }
+ 
+ */
 
-  case 16:
-    out = function_NormalizedLogisticSigmoid (x, a);  //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    break;
-  case 17:
-    out = function_CircularFillet (x, a, b, d);
-    break;
-  case 18:
-    out = function_CircularArcThroughAPoint (x, a, b);  
-    break;
-
-  case 19:
-    out = function_CubicBezierThrough2Points (x, a, b, c, d);
-    break;
-  case 20:
-    out = function_ParabolaThroughAPoint (x, a, b);
-    break;
-  case 21:
-    out = function_QuadraticBezier (x, a, b);
-    break;
-  case 22:
-    out = function_CubicBezier (x, a, b, c, d);
-    break;
-  case 23: 
-    out = function_Identity(x);
-    break;
-  case 24: 
-    out =  function_CircularEaseIn(x);
-    break;
-  case 25:
-    out =  function_CircularEaseOut(x);
-    break;
-
-  case 26:
-    out = function_SmoothStep(x); 
-    break;
-  case 27:
-    out = function_SmootherStep(x); 
-    break;
-  case 28:
-    out = function_MaclaurinCos(x); 
-    break;
-
-  case 29: 
-    out = function_CatmullRomInterpolate (x, a, b);
-    break;
-  case 30: 
-    out = function_HermiteAdvanced (x, a, b);
-    break;
-  case 31: 
-    out = function_NormalizedErf(x); 
-    break;
-  case 32:
-    out = function_NormalizedInverseErf(x); 
-    break;
-
-  case 33: 
-    out = function_SimpleHalfGaussian (x); 
-    break;
-  case 34: 
-    out = function_AdjustableFwhmHalfGaussian (x, a); 
-    break;
-  case 35: 
-    out = function_AdjustableSigmaHalfGaussian (x, a); 
-    break;
-  case 36:
-    out = function_HalfGaussianThroughAPoint (x, a, b); 
-    break;
-
-  case 37:
-    out = function_PennerEaseInBack (x); 
-    break;
-  case 38: 
-    out = function_PennerEaseOutBack (x); 
-    break; 
-  case 39:
-    out = function_PennerEaseInOutBack (x); 
-    break;
-  case 40: 
-    out = function_CircularEaseInOut (x);
-    break;
-
-  case 41: 
-    out = function_PennerEaseInQuadratic (x); 
-    break;
-  case 42: 
-    out = function_PennerEaseOutQuadratic (x); 
-    break; 
-  case 43: 
-    out = function_PennerEaseInOutQuadratic (x); 
-    break;  
-
-  case 44:
-    out = function_PennerEaseInCubic (x); 
-    break;
-  case 45:
-    out = function_PennerEaseOutCubic (x); 
-    break;
-  case 46: 
-    out = function_PennerEaseInOutCubic (x); 
-    break;
-
-  case 47: 
-    out = function_PennerEaseInQuartic (x); 
-    break;
-  case 48: 
-    out = function_PennerEaseOutQuartic (x); 
-    break;
-  case 49: 
-    out = function_PennerEaseInOutQuartic (x); 
-    break;
-
-  case 50: 
-    out = function_PennerEaseInQuintic (x); 
-    break; 
-  case 51: 
-    out = function_PennerEaseOutQuintic (x); 
-    break; 
-  case 52: 
-    out = function_PennerEaseInOutQuintic (x); 
-    break; 
-
-  case 53: 
-    out = function_PennerEaseInElastic (x); 
-    break;
-  case 54:
-    out = function_PennerEaseOutElastic (x); 
-    break;
-  case 55:
-    out = function_PennerEaseInOutElastic (x); 
-    break;
-
-
-
-  case 56: 
-    out = function_PennerEaseInExpo (x); 
-    break;
-  case 57: 
-    out = function_PennerEaseOutExpo (x); 
-    break;
-  case 58: 
-    out = function_PennerEaseInOutExpo (x); 
-    break;
-
-  case 59: 
-    out = function_PennerEaseInSine (x); 
-    break;
-  case 60: 
-    out = function_PennerEaseOutSine (x); 
-    break;
-  case 61: 
-    out = function_PennerEaseInOutSine (x); 
-    break;
-
-
-  case 62: 
-    out = function_PennerEaseInBounce (x); 
-    break;
-  case 63: 
-    out = function_PennerEaseOutBounce (x); 
-    break;
-  case 64: 
-    out = function_PennerEaseInOutBounce (x); 
-    break;
-
-
-  case 65: 
-    out = function_HalfLanczosSincWindow (x); 
-    break;
-  case 66:
-    out = function_HalfNuttallWindow (x); 
-    break;
-  case 67:
-    out = function_HalfBlackmanNuttallWindow (x); 
-    break;
-  case 68:
-    out = function_HalfBlackmanHarrisWindow (x); 
-    break;
-  case 69: 
-    out = function_HalfExactBlackmanWindow (x); 
-    break;
-  case 70:
-    out = function_HalfGeneralizedBlackmanWindow (x, a); 
-    break;
-  case 71: 
-    out = function_HalfFlatTopWindow (x); 
-    break;
-  case 72: 
-    out = function_HalfBartlettHannWindow (x); 
-    break;
-
-  case 73: 
-    out = function_BartlettWindow (x); 
-    break;
-  case 74: 
-    out = function_CosineWindow (x);
-    break;
-  case 75: 
-    out = function_TukeyWindow (x, a); 
-    break;
-
-
-  case 76: 
-    out = function_AdjustableSigmaGaussian (x, a); 
-    break;
-  case 77: 
-    out = function_LanczosSincWindow (x); 
-    break;
-  case 78: 
-    out = function_NuttallWindow (x); 
-    break;
-  case 79: 
-    out = function_BlackmanNuttallWindow (x); 
-    break;
-  case 80: 
-    out = function_BlackmanHarrisWindow (x); 
-    break;
-  case 81: 
-    out = function_ExactBlackmanWindow (x); 
-    break;
-  case 82: 
-    out = function_GeneralizedBlackmanWindow (x, a); 
-    break;
-  case 83: 
-    out = function_FlatTopWindow (x); 
-    break;
-  case 84: 
-    out = function_BartlettHannWindow (x); 
-    break;
-  case 85: 
-    out = function_HannWindow (x); 
-    break;  
-  case 86: 
-    out = function_HammingWindow (x); 
-    break;
-  case 87: 
-    out = functionGeneralizedTriangleWindow (x, a); 
-    break;
-  case 88: 
-    out = functionPoissonWindow (x, a); 
-    break;
-  case 89: 
-    out = functionHannPoissonWindow (x, a); 
-    break;
-  case 90: 
-    param_n = 7;
-    out = function_Staircase (x, param_n); 
-    break;
-  case 91: 
-    out = function_Gompertz (x, a); 
-    break;
-
-  case 92: 
-    out = function_NormalizedLogit (x, a); 
-    break;
-  case 93: 
-    out = function_NormalizedLogisticSigmoid (x, a); 
-    break;
-  case 94: 
-    out = function_GeneralSigmoidLogitCombo (x, a, b); 
-    break;  
-
-  case 95: 
-    out = function_GeneralizedLinearMap (x, a, b, c, d);
-    break;
-  case 96:
-    out = function_AdjustableCenterCosineWindow (x, a);
-    break;
-  case 97: 
-    out = function_AdjustableCenterEllipticWindow (x, a);
-    break;
-  case 98: 
-    param_n = 7;
-    out = function_ExponentialSmoothedStaircase (x, a, param_n);
-    break;
-
-  case 99: 
-    out = function_Inverse (x); 
-    break;
-  case 100: 
-    out = function_SlidingAdjustableSigmaGaussian (x, a, b); 
-    break;
-  }
-  return out;
-}
-
-
-
-
-
-///////////////////////////////////////////////////////////
-// Notes for introspection implementation (TO DO)
-// import java.lang.*;
-// import java.lang.reflect.Method;
-// import java.lang.reflect.Type;
+/////////////////////////////////////////////////////////////////////////
+//
+// Notes for introspection 
+// Documentation here: 
 // http://docs.oracle.com/javase/1.5.0/docs/api/java/lang/Object.html
 // http://docs.oracle.com/javase/1.5.0/docs/api/java/lang/reflect/Method.html
 // http://docs.oracle.com/javase/1.5.0/docs/api/java/lang/Class.html
-// Method.invoke // Object   invoke(Object obj, Object... args) 
-// String rts = m.getReturnType().toString(); // assumed to be float
+//
+// Be sure to import the following: 
+// import java.lang.*;
+// import java.lang.reflect.Method;
+// import java.lang.reflect.Type;
+//
+// Other notes:
+// Method.invoke(..) // allows calling of a function!
+// String rts = m.getReturnType().toString(); // assumed to be float, for us.
 
 ArrayList<Method> functionMethodArraylist; 
 int nFunctionMethods;
 
 void introspect() {
-
-  // compile an ArrayList containing all the shaper functions. 
+  // Examine the current class, extract the names of the functions,  
+  // then compile an ArrayList containing all the shaper functions. 
   functionMethodArraylist = new ArrayList<Method>();
   nFunctionMethods = 0; 
 
   try {
-    String fullClassName = this.getClass().getName(); // + "$" + "Booper";
+    // This fetches the class name for the current (PApplet) class, 
+    // which happens to contain all of the functions. For Processing, if the functions
+    // were instead inside an inner class (say, "FunctionManager", we would  
+    // add the following to the fullClassName: // + "$" + "FunctionManager";
+    String fullClassName = this.getClass().getName(); 
     Class myClassName = Class.forName(fullClassName);
 
     int funcCount = 0; 
