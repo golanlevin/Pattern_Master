@@ -363,7 +363,7 @@ void drawAnimatingRadiusCircle() {
   // Draw a circle whose radius is linked to the function value. 
   // Inspired by @marcinignac & @soulwire: http://codepen.io/vorg/full/Aqyre   
 
-  float blooperCx = margin0+bandTh/2.0;
+    float blooperCx = margin0+bandTh/2.0;
   float blooperCy = margin0+bandTh/2.0;
   float val = function (probe_x, param_a, param_b, param_c, param_d, param_n);
   float blooperR = bandTh * val;
@@ -537,6 +537,7 @@ void drawLabels() {
   }
 }
 
+//-----------------------------------------------------
 void drawModeSpecificGraphics() {
 
   int whichFunction = FUNCTIONMODE%nFunctionMethods;  
@@ -559,6 +560,15 @@ void drawModeSpecificGraphics() {
   stroke(180, 180, 255);
 
   switch (nParams) {
+  case 2:
+    if (methodName.equals("function_AdjustableFwhmHalfGaussian")) {
+      x = xoffset + param_a * xscale;
+      y = yoffset + yscale * (1.0 - function_AdjustableFwhmHalfGaussian (param_a, param_a));
+      line (x, yoffset+yscale, x, y); 
+      line (xoffset, y, x, y);
+    }
+    break;
+    
   case 3:
     if (bHasIntegerArgument == false) {
       // through a point
@@ -566,6 +576,46 @@ void drawModeSpecificGraphics() {
       y = yoffset + (1-param_b) * yscale;
       line(x-K, y, x+K, y); 
       line(x, y-K, x, y+K);
+
+      if (methodName.equals("function_QuadraticBezier")) {
+        line (xoffset, yoffset + yscale, x, y);
+        line (xoffset + xscale, yoffset, x, y);
+      }
+    }
+    break;
+
+  case 4:
+    if (methodName.equals("function_CircularFillet")) {
+      x = xoffset + arcCenterX * xscale;
+      y = yoffset + (1-arcCenterY) * yscale;
+      float d = 2.0 * arcRadius * xscale;
+      ellipseMode(CENTER);
+      ellipse(x, y, d, d);
+
+      x = xoffset + param_a * xscale;
+      y = yoffset + (1-param_b) * yscale;
+      line(x-K, y, x+K, y); 
+      line(x, y-K, x, y+K);
+    }
+    break;
+
+  case 5: // (including x itself)
+    if (bHasIntegerArgument == false) {
+      // two crosses
+      xa = xoffset + param_a * xscale;
+      yb = yoffset + (1-param_b) * yscale;
+      xc = xoffset + param_c * xscale;
+      yd = yoffset + (1-param_d) * yscale;
+      line(xa-K, yb, xa+K, yb); 
+      line(xa, yb-K, xa, yb+K); 
+      line(xc-K, yd, xc+K, yd); 
+      line(xc, yd-K, xc, yd+K);
+
+      if (methodName.equals("function_CubicBezier")) {
+        line (xoffset, yoffset + yscale, xa, yb);
+        line (xc, yd, xa, yb);
+        line (xoffset + xscale, yoffset, xc, yd);
+      }
     }
     break;
   }
@@ -686,12 +736,6 @@ void drawModeSpecificGraphicsOLD() {
 
   switch (FUNCTIONMODE) {
 
-  case 21: //function_QuadraticBezier
-    x = xoffset + param_a * xscale;
-    y = yoffset + (1-param_b) * yscale;
-    line (xoffset, yoffset + yscale, x, y);
-    line (xoffset + xscale, yoffset, x, y);
-    break;
 
   case 22: // cubic bezier
     xa = xoffset + param_a * xscale;
@@ -703,32 +747,6 @@ void drawModeSpecificGraphicsOLD() {
     line (xoffset + xscale, yoffset, xc, yd);
     break;
 
-  case 0: 
-  case 2:
-  case 3:
-  case 5:
-  case 8:
-  case 20: 
-  case 18:  
-  case 36:
-    // through a point
-    x = xoffset + param_a * xscale;
-    y = yoffset + (1-param_b) * yscale;
-    line(x-K, y, x+K, y); 
-    line(x, y-K, x, y+K); 
-    break;
-
-  case 19:
-  case 95:
-    xa = xoffset + param_a * xscale;
-    yb = yoffset + (1-param_b) * yscale;
-    xc = xoffset + param_c * xscale;
-    yd = yoffset + (1-param_d) * yscale;
-    line(xa-K, yb, xa+K, yb); 
-    line(xa, yb-K, xa, yb+K); 
-    line(xc-K, yd, xc+K, yd); 
-    line(xc, yd-K, xc, yd+K); 
-    break;
 
   case 17: // circular fillet
     x = xoffset + arcCenterX * xscale;

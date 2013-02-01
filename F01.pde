@@ -36,6 +36,42 @@ float function_GeneralizedLinearMap (float x, float a, float b, float c, float d
 }
 
 
+// Generalized map
+float function_TripleLinear (float x, float a, float b, float c, float d) {
+  functionName = "Triple Linear";
+  useParameterA = true;
+  useParameterB = true;
+  useParameterC = true;
+  useParameterD = true;
+  useParameterN = false;
+
+  float y = 0;
+  if (a < c) {
+    if (x <= a) {
+      y = map(x, 0,a, 0,b);
+    } 
+    else if (x >= c) {
+      y = map(x, c,1, d,1);
+    } 
+    else {
+      y = map(x, a, c, b, d);
+    }
+  } 
+  else {
+    if (x <= c) {
+      y = map(x, 0,c, 0,d);
+    } 
+    else if (x >= a) {
+      y = map(x, a,1, b,1);
+    } 
+    else {
+      y = map(x, c, a, d, b);
+    }
+  }
+  return y;
+}
+
+
 
 // Double-(Odd) Polynomial Seat
 //------------------------------------------------------------------

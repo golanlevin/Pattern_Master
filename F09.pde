@@ -531,9 +531,9 @@ float function_SlidingAdjustableSigmaGaussian (float x, float a, float b) {
   useParameterC = useParameterD = useParameterN = false;
   
   x *= 2.0;
-  a *= 2.0; 
-  float sigma = a;
-  float dx = 2.0*(b - 0.5); 
+  b *= 2.0; 
+  float sigma = b;
+  float dx = 2.0*(a - 0.5); 
   float out = exp(0.0 - (sq(x-1.0 -dx) / (2.0*sigma*sigma))); 
   return out;
 }
