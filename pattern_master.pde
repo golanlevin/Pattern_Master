@@ -60,13 +60,11 @@ boolean visited = false;
 boolean bClickedInGraph = false;
 String functionName = "";
 
-float noiseRawHistory[]; 
-float noiseFilteredHistory[];
-float sineRawHistory[]; 
-float sineFilteredHistory[];
-
 int FUNCTIONMODE = 0;
 int MAX_N_FLOAT_PARAMS = 4;
+
+DataHistoryGraph noiseHistory;
+DataHistoryGraph cosHistory;
 
 //-----------------------------------------------------
 void keyPressed() {
@@ -92,17 +90,12 @@ void setup() {
   size (scrW, scrH);// OPENGL);
   // println("App dimensions: " + scrW + " x " + scrH);
 
-  noiseRawHistory      = new float[(int)xscale];
-  noiseFilteredHistory = new float[(int)xscale];
-  sineRawHistory       = new float[(int)xscale];
-  sineFilteredHistory  = new float[(int)xscale];
-  for (int i=0; i<xscale; i++) {
-    noiseFilteredHistory[i] = noiseRawHistory[i] = 0.5;
-    sineFilteredHistory[i]  = sineRawHistory[i]  = 0.5;
-  }
 
+  initHistories();
   introspect();
 }
+
+
 
 //-----------------------------------------------------
 void mouseMoved() {
@@ -281,12 +274,14 @@ void updateParameters() {
   if (mousePressed && bClickedInGraph) {
     if (visited) {
       if (whichButton == 1) {
+        // Use the left mouse button for parameters a & b
         param_a =   (float)(mouseX - xoffset)/xscale;
         param_b = 1-(float)(mouseY - yoffset)/yscale;
         param_a = constrain(param_a, 0, 1); 
         param_b = constrain(param_b, 0, 1);
       } 
       else if (whichButton == 2) {
+        // Use the left mouse button for parameters c & d
         param_c =   (float)(mouseX - xoffset)/xscale;
         param_d = 1-(float)(mouseY - yoffset)/yscale;
         param_c = constrain(param_c, 0, 1); 
@@ -320,7 +315,7 @@ void drawMainFunctionCurve() {
 
     stroke(0);
     if ((y < 0) || (y > 1)) {
-      stroke(200);
+      stroke(boundingBoxStrokeColor);
     } 
 
     px = xoffset + round(xscale * x);
@@ -407,85 +402,91 @@ void drawGrayLevels() {
 }
 
 
-//-----------------------------------------------------
-void drawNoiseHistories() {
+//===========================================================
+class DataHistoryGraph {
+  float rawHistory[];
+  int nData;
 
-  float nhy = margin0 + bandTh + margin1 + yscale + margin2;
-  float shy = margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin1;
-  int nData = (int)xscale; 
-
-  // update noise history
-  for (int i=0; i<(nData-1); i++) {
-    noiseRawHistory[i] = noiseRawHistory[i+1];
+  //-------------------------
+  DataHistoryGraph (int len) {
+    nData = len;
+    rawHistory      = new float[nData];
+    for (int i=0; i<nData; i++) {
+      rawHistory[i] = 0.5;
+    }
   }
-  noiseRawHistory[nData-1] = noise(millis()/ (nData/2.0)); 
 
-  // update sine history
-  for (int i=0; i<(nData-1); i++) {
-    sineRawHistory[i] = sineRawHistory[i+1];
+  //-------------------------
+  void update (float newVal) {
+    // update noise history
+    for (int i=0; i<(nData-1); i++) {
+      rawHistory[i] = rawHistory[i+1];
+    }
+    rawHistory[nData-1] = newVal;
   }
-  sineRawHistory[nData-1] = 0.5 + (0.45 * cos(PI * millis()/animationConstant));   
 
+  //-------------------------
+  void draw (float xoffset, float nhy) {
 
-  // draw bounding rectangles
-  noFill(); 
-  stroke(boundingBoxStrokeColor);
-  rect (xoffset, nhy, xscale, bandTh);
-  rect (xoffset, shy, xscale, bandTh);
+    // draw bounding rectangles
+    noFill(); 
+    stroke(boundingBoxStrokeColor);
+    rect (xoffset, nhy, xscale, bandTh);
 
-  // draw raw noise history
-  noFill(); 
-  stroke(180); 
-  beginShape(); 
-  for (int i=0; i<nData; i++) {
-    float x = xoffset + i;
-    float valRaw = 1.0 - constrain(noiseRawHistory[i], 0, 1);
-    float y = nhy + bandTh * valRaw;
-    vertex(x, y);
+    // draw raw noise history
+    noFill(); 
+    stroke(180); 
+    beginShape(); 
+    for (int i=0; i<nData; i++) {
+      float x = xoffset + i;
+      float valRaw = 1.0 - constrain(rawHistory[i], 0, 1);
+      float y = nhy + bandTh * valRaw;
+      vertex(x, y);
+    }
+    endShape(); 
+
+    // draw filtered noise history
+    noFill(); 
+    stroke(0); 
+    beginShape(); 
+    for (int i=0; i<nData; i++) {
+      float x = xoffset + i;
+      float valRaw = rawHistory[i];
+      float valFiltered = 1.0 - function (valRaw, param_a, param_b, param_c, param_d, param_n);
+      valFiltered = constrain(valFiltered, 0, 1); 
+      float y = nhy + bandTh * valFiltered;
+      vertex(x, y);
+    }
+    endShape();
   }
-  endShape(); 
-
-  // draw filtered noise history
-  noFill(); 
-  stroke(0); 
-  beginShape(); 
-  for (int i=0; i<nData; i++) {
-    float x = xoffset + i;
-    float valRaw = noiseRawHistory[i];
-    float valFiltered = 1.0 - function (valRaw, param_a, param_b, param_c, param_d, param_n);
-    valFiltered = constrain(valFiltered, 0, 1); 
-    float y = nhy + bandTh * valFiltered;
-    vertex(x, y);
-  }
-  endShape();
-
-  //----------------
-  // draw raw sine history
-  noFill(); 
-  stroke(180); 
-  beginShape(); 
-  for (int i=0; i<nData; i++) {
-    float x = xoffset + i;
-    float valRaw = 1.0 - constrain(sineRawHistory[i], 0, 1);
-    float y = shy + bandTh * valRaw;
-    vertex(x, y);
-  }
-  endShape(); 
-
-  // draw filtered sine history
-  noFill(); 
-  stroke(0); 
-  beginShape(); 
-  for (int i=0; i<nData; i++) {
-    float x = xoffset + i;
-    float valRaw = sineRawHistory[i];
-    float valFiltered = 1.0 - function (valRaw, param_a, param_b, param_c, param_d, param_n);
-    valFiltered = constrain(valFiltered, 0, 1); 
-    float y = shy + bandTh * valFiltered;
-    vertex(x, y);
-  }
-  endShape();
+  
 }
+
+
+//-----------------------------------------------------
+void initHistories() {
+
+  noiseHistory = new DataHistoryGraph ((int)xscale);
+  cosHistory   = new DataHistoryGraph ((int)xscale);
+}
+
+
+//-----------------------------------------------------
+void drawNoiseHistories(){
+  
+  // update with the latest incoming values
+  int nData = (int)xscale;
+  float noiseVal = noise(millis()/ (nData/2.0));
+  float cosVal   = 0.5 + (0.45 * cos(PI * millis()/animationConstant));
+  noiseHistory.update( noiseVal ); 
+  cosHistory.update( cosVal );  
+  
+  float nhy = margin0 + bandTh + margin1 + yscale + margin2;
+  float chy = margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin1;
+  noiseHistory.draw ( xoffset, nhy); 
+  cosHistory.draw   ( xoffset, chy); 
+}
+
 
 
 //-----------------------

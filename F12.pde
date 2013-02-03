@@ -28,8 +28,12 @@ float function_CircularFillet (float x, float a, float b, float c) {
   x = constrain(x, 0, 1); 
 
   if (x <= arcStartX) {
-    t = x / arcStartX;
-    y = t * arcStartY;
+    if (arcStartX < epsilon){
+      y = 0;
+    } else {
+      t = x / arcStartX;
+      y = t * arcStartY;
+    }
   } 
   else if (x >= arcEndX) {
     t = (x - arcEndX)/(1 - arcEndX);
