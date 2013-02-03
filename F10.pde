@@ -2,11 +2,6 @@
 
 float function_ExponentialEmphasis (float x, float a){
   functionName = "Exponential Emphasis";
-  useParameterA = true;
-  useParameterB = false;
-  useParameterC = false;
-  useParameterD = false;
-  useParameterN = false;
   
   float epsilon = 0.00001;
   float min_param_a = 0.0 + epsilon;

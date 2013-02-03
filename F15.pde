@@ -1,14 +1,7 @@
 // Parabola (Quadratic) Through a Point
-
 //------------------------------------------------------------------
 float function_ParabolaThroughAPoint (float x, float a, float b){
-
   functionName = "Quadratic Through a Given Point";
-  useParameterA = true;
-  useParameterB = true;
-  useParameterC = false;
-  useParameterD = false;
-  useParameterN = false;
   
   float epsilon = 0.00001;
   float min_param_a = 0.0 + epsilon;
@@ -24,7 +17,6 @@ float function_ParabolaThroughAPoint (float x, float a, float b){
   y = constrain(y, 0,1); 
   
   return y;
-
 }
 
 

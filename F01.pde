@@ -3,12 +3,7 @@
 // Generalized map
 float function_GeneralizedLinearMap (float x, float a, float b, float c, float d) {
   functionName = "Generalized Linear Map";
-  useParameterA = true;
-  useParameterB = true;
-  useParameterC = true;
-  useParameterD = true;
-  useParameterN = false;
-
+  
   float y = 0;
   if (a < c) {
     if (x <= a) {
@@ -39,11 +34,6 @@ float function_GeneralizedLinearMap (float x, float a, float b, float c, float d
 // Generalized map
 float function_TripleLinear (float x, float a, float b, float c, float d) {
   functionName = "Triple Linear";
-  useParameterA = true;
-  useParameterB = true;
-  useParameterC = true;
-  useParameterD = true;
-  useParameterN = false;
 
   float y = 0;
   if (a < c) {
@@ -72,16 +62,10 @@ float function_TripleLinear (float x, float a, float b, float c, float d) {
 }
 
 
-
 // Double-(Odd) Polynomial Seat
 //------------------------------------------------------------------
 float function_DoubleOddPolynomialSeat (float x, float a, float b, int n) {
   functionName = "Double-Odd-Polynomial Seat";
-  useParameterA = true;
-  useParameterB = true;
-  useParameterC = false;
-  useParameterD = false;
-  useParameterN = true;
 
   float epsilon = 0.00001;
   float min_param_a = 0.0 + epsilon;

@@ -6,11 +6,6 @@
 //------------------------------------------------------------------
 float function_QuadraticBezier (float x, float a, float b){
   functionName = "Quadratic Bezier";
-  useParameterA = true;
-  useParameterB = true;
-  useParameterC = false;
-  useParameterD = false;
-  useParameterN = false;
 
   float epsilon = 0.00001;
   float min_param_a = 0.0;
@@ -24,23 +19,16 @@ float function_QuadraticBezier (float x, float a, float b){
     a += epsilon;
   }
   // solve t from x (an inverse operation)
-  float om2a = 1 - 2*a;
+  float om2a = 1.0 - 2.0*a;
   float t = (sqrt(a*a + om2a*x) - a)/om2a;
-  float y = (1-2*b)*(t*t) + (2*b)*t;
+  float y = (1.0-2.0*b)*(t*t) + (2*b)*t;
   return y;
 }
 
 
 //------------------------------------------------------------------
 float function_CubicBezier (float x, float a, float b, float c, float d){
-
-
   functionName = "Cubic Bezier";
-  useParameterA = true;
-  useParameterB = true;
-  useParameterC = true;
-  useParameterD = true;
-  useParameterN = false;
 
   float epsilon = 0.00001;
   float min_param_a = 0.0 + epsilon;

@@ -1,12 +1,7 @@
 
 //------------------------------------------------------------------
 float function_CubicBezierThrough2Points (float x, float a, float b, float c, float d){
-  functionName = "Cubic Bezier Through 2 Points";  
-  useParameterA = true;
-  useParameterB = true;
-  useParameterC = true;
-  useParameterD = true;
-  useParameterN = false;
+  functionName = "Cubic Bezier (Nearly) Through 2 Points"; 
 
   float y = 0;
 
@@ -55,13 +50,11 @@ float function_CubicBezierThrough2Points (float x, float a, float b, float c, fl
 
   y = function_CubicBezier (x, x1,y1, x2,y2);
   y = constrain(y,0,1); 
-  functionName = "Cubic Bezier Nearly Through 2 Points";  
+  
+  functionName = "Cubic Bezier (Nearly) Through 2 Points";  
   return y;
 
 }
-
-
-
 
 //==============================================================
 float B0 (float t){

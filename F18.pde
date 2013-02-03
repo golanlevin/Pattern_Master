@@ -15,12 +15,6 @@ float function_GeneralSigmoidLogitCombo (float x, float a, float b){
   }
   
   functionName = "General Sigmoid-Logit Combination";
-  useParameterA = true;
-  useParameterB = true;
-  useParameterC = false;
-  useParameterD = false;
-  useParameterN = false;
-  
   y = constrain(y, 0,1); 
   return y;
 }
@@ -28,11 +22,6 @@ float function_GeneralSigmoidLogitCombo (float x, float a, float b){
 //------------------------------------------------------------------
 float function_NormalizedLogisticSigmoid (float x, float a) {
   functionName = "Normalized Logistic Sigmoid";
-  useParameterA = true;
-  useParameterB = false;
-  useParameterC = false;
-  useParameterD = false;
-  useParameterN = false;
 
   float epsilon = 0.0001;
   float min_param_a = 0.0 + epsilon;
@@ -40,7 +29,7 @@ float function_NormalizedLogisticSigmoid (float x, float a) {
   float emph = 5.0;
 
   a = constrain(a, min_param_a, max_param_a);
-  a = (1/(1-a) - 1); 
+  a = (1.0/(1.0-a) - 1.0); 
   a = emph * a;
 
   float y    = 1.0 / (1.0 + exp(0 - (x-0.5)*a    ));
@@ -55,11 +44,6 @@ float function_NormalizedLogisticSigmoid (float x, float a) {
 float function_NormalizedLogit (float x, float a) {
   // http://en.wikipedia.org/wiki/Logit
   functionName = "Normalized Logit Function";
-  useParameterA = true;
-  useParameterB = false;
-  useParameterC = false;
-  useParameterD = false;
-  useParameterN = false;
 
   float epsilon = 0.0001;
   float min_param_a = 0.0 + epsilon;

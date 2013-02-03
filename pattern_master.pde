@@ -9,6 +9,7 @@
 // http://en.wikipedia.org/wiki/Generalised_logistic_function Richard's Curve
 // http://en.wikipedia.org/wiki/Probit_function
 // http://mathworld.wolfram.com/HeavisideStepFunction.html
+// generalized damped sinusoid
 //
 // RESTORE MODE-SPECIFIC GRAPHICS!!!
 
@@ -65,16 +66,18 @@ float sineRawHistory[];
 float sineFilteredHistory[];
 
 int FUNCTIONMODE = 0;
-int NFUNCTIONS = 101; //!!!!!!!!!!!!!!!!!!!!!!!!!!
+int MAX_N_FLOAT_PARAMS = 4;
 
 //-----------------------------------------------------
 void keyPressed() {
+  int nFunctions = functionMethodArraylist.size(); 
+
   if (key == CODED) { 
     if ((keyCode == UP) || (keyCode == RIGHT)) { 
-      FUNCTIONMODE = (FUNCTIONMODE+1)%NFUNCTIONS;
+      FUNCTIONMODE = (FUNCTIONMODE+1)%nFunctions;
     } 
     else if ((keyCode == DOWN) || (keyCode == LEFT)) { 
-      FUNCTIONMODE = (FUNCTIONMODE-1+NFUNCTIONS)%NFUNCTIONS;
+      FUNCTIONMODE = (FUNCTIONMODE-1+nFunctions)%nFunctions;
     }
   } 
   if (key=='P') {
@@ -335,7 +338,7 @@ void drawAnimatingProbe() {
   // inspired by @marcinignac & @soulwire 
   // from http://codepen.io/vorg/full/Aqyre 
 
-    float x = constrain(probe_x, 0, 1);
+    float x = constrain (probe_x, 0, 1);
   float y = probe_y = 1 - function (x, param_a, param_b, param_c, param_d, param_n);
   float px = xoffset + round(xscale * x);
   float py = yoffset + round(yscale * y);
@@ -487,53 +490,48 @@ void drawNoiseHistories() {
 
 //-----------------------
 void drawLabels() {
+
+  int nCurrentFunctionArgs = getCurrentFunctionNArgs() - 1; // we subtract 1, for x itself
+  boolean bHasFinalIntArg = doesCurrentFunctionHaveFinalIntegerArgument(); 
+
   float grayEnable = 64;
   float grayDisable = 192;
+  float textLineHeight = 13; 
+  float yBase = 15; 
 
+  float params[] = {
+    param_a, param_b, param_c, param_d
+  }; 
+
+  //------------------
   fill(grayEnable);
-  text(functionName, xoffset, yoffset+yscale+15);
-  if (useParameterA) {
-    fill (grayEnable); 
-    text("a: " + nf(param_a, 1, 3), xoffset, yoffset+yscale+28);
-  } 
-  else {
-    fill (grayDisable);
-    text("a: -----", xoffset, yoffset+yscale+28);
-  }
-  if (useParameterB) {
-    fill (grayEnable);
-    text("b: " + nf(param_b, 1, 3), xoffset, yoffset+yscale+41);
-  } 
-  else {
-    fill (grayDisable);
-    text("b: -----", xoffset, yoffset+yscale+41);
+  text(functionName, xoffset, yoffset+yscale+yBase);
+  int lastArgIndex = (bHasFinalIntArg) ? (nCurrentFunctionArgs-1) : nCurrentFunctionArgs; 
+
+  float yPos; 
+  for (int i=0; i<MAX_N_FLOAT_PARAMS; i++) {
+    char argName = (char)('a'+i);
+    yPos = yoffset+yscale+ yBase+((i+1)*textLineHeight);
+
+    if (i<lastArgIndex) {
+      fill (grayEnable);
+      text(argName + ": " + nf(params[i], 1, 3), xoffset, yPos);
+    } 
+    else {
+      fill (grayDisable);
+      text(argName + ": -----", xoffset, yPos);
+    }
   }
 
-  if (useParameterC) {
+  //------------------
+  yPos = yoffset+yscale+ yBase + ((MAX_N_FLOAT_PARAMS+1)*textLineHeight);
+  if (bHasFinalIntArg) {
     fill (grayEnable);
-    text("c: " + nf(param_c, 1, 3), xoffset, yoffset+yscale+54);
+    text("n: " + param_n, xoffset, yPos);
   } 
   else {
     fill (grayDisable);
-    text("c: -----", xoffset, yoffset+yscale+54);
-  }
-
-  if (useParameterD) {
-    fill (grayEnable);
-    text("d: " + nf(param_d, 1, 3), xoffset, yoffset+yscale+67);
-  } 
-  else {
-    fill (grayDisable);
-    text("d: -----", xoffset, yoffset+yscale+67);
-  }
-
-  if (useParameterN) {
-    fill (grayEnable);
-    text("n: " + param_n, xoffset, yoffset+yscale+80);
-  } 
-  else {
-    fill (grayDisable);
-    text("n: -----", xoffset, yoffset+yscale+80);
+    text("n: -----", xoffset, yPos);
   }
 }
 
@@ -555,32 +553,40 @@ void drawModeSpecificGraphics() {
   float xa, yb;
   float xc, yd;
   float K = 12;
+  float cr = 7;
 
   noFill();
   stroke(180, 180, 255);
 
   switch (nParams) {
   case 2:
-    if (methodName.equals("function_AdjustableFwhmHalfGaussian")) {
+    if (methodName.equals("function_AdjustableFwhmHalfGaussian") ||
+      methodName.equals("function_AdjustableSigmaHalfGaussian")) {
       x = xoffset + param_a * xscale;
-      y = yoffset + yscale * (1.0 - function_AdjustableFwhmHalfGaussian (param_a, param_a));
+      float val = 1.0 - function (param_a, param_a, param_b, param_c, param_d, param_n);
+      y = yoffset + yscale * val; 
       line (x, yoffset+yscale, x, y); 
       line (xoffset, y, x, y);
     }
     break;
-    
+
   case 3:
     if (bHasIntegerArgument == false) {
       // through a point
       x = xoffset + param_a * xscale;
       y = yoffset + (1-param_b) * yscale;
-      line(x-K, y, x+K, y); 
-      line(x, y-K, x, y+K);
 
       if (methodName.equals("function_QuadraticBezier")) {
         line (xoffset, yoffset + yscale, x, y);
         line (xoffset + xscale, yoffset, x, y);
       }
+
+      line(x-K, y, x+K, y); 
+      line(x, y-K, x, y+K);
+      fill (255, 255, 255); 
+      ellipse(x, y, cr, cr);
+    } 
+    else {
     }
     break;
 
@@ -596,6 +602,16 @@ void drawModeSpecificGraphics() {
       y = yoffset + (1-param_b) * yscale;
       line(x-K, y, x+K, y); 
       line(x, y-K, x, y+K);
+      fill (255, 255, 255); 
+      ellipse(x, y, cr, cr);
+    } 
+    else {
+      x = xoffset + param_a * xscale;
+      y = yoffset + (1-param_b) * yscale;
+      line(x-K, y, x+K, y); 
+      line(x, y-K, x, y+K);
+      fill (255, 255, 255); 
+      ellipse(x, y, cr, cr);
     }
     break;
 
@@ -616,6 +632,10 @@ void drawModeSpecificGraphics() {
         line (xc, yd, xa, yb);
         line (xoffset + xscale, yoffset, xc, yd);
       }
+
+      fill (255, 255, 255); 
+      ellipse(xa, yb, cr, cr); 
+      ellipse(xc, yd, cr, cr);
     }
     break;
   }
@@ -736,7 +756,6 @@ void drawModeSpecificGraphicsOLD() {
 
   switch (FUNCTIONMODE) {
 
-
   case 22: // cubic bezier
     xa = xoffset + param_a * xscale;
     yb = yoffset + (1-param_b) * yscale;
@@ -778,6 +797,34 @@ void drawModeSpecificGraphicsOLD() {
 }
 
 //===============================================================
+int getCurrentFunctionNArgs() {
+  int whichFunction = FUNCTIONMODE % nFunctionMethods;  
+  Method whichMethod = functionMethodArraylist.get(whichFunction); 
+  Type[] params = whichMethod.getGenericParameterTypes();
+  int nParams = params.length;
+  return nParams;
+}
+
+//===============================================================
+boolean doesCurrentFunctionHaveFinalIntegerArgument() {
+  // determine if the current function has a (final) integer argument.
+
+  int whichFunction = FUNCTIONMODE % nFunctionMethods;  
+  Method whichMethod = functionMethodArraylist.get(whichFunction); 
+  Type[] params = whichMethod.getGenericParameterTypes();
+  int nParams = params.length;
+
+  boolean bHasFinalIntegerArgument = false;
+  for (int p=0; p<nParams; p++) {
+    String paramString = params[p].toString();
+    if (paramString.equals("int")) {
+      bHasFinalIntegerArgument = true;
+    }
+  }
+  return bHasFinalIntegerArgument;
+}
+
+//===============================================================
 float function (float x, float a, float b, float c, float d, int n) {
   float out = 0; 
   nFunctionMethods = functionMethodArraylist.size(); 
@@ -785,17 +832,8 @@ float function (float x, float a, float b, float c, float d, int n) {
     int whichFunction = FUNCTIONMODE%nFunctionMethods;  
     Method whichMethod = functionMethodArraylist.get(whichFunction); 
 
-    Type[] params = whichMethod.getGenericParameterTypes();
-    int nParams = params.length;
-
-    // determine if the current function has an integer argument.
-    boolean bHasFinalIntegerArgument = false;
-    for (int p=0; p<nParams; p++) {
-      String paramString = params[p].toString();
-      if (paramString.equals("int")) {
-        bHasFinalIntegerArgument = true;
-      }
-    }
+    int nParams = getCurrentFunctionNArgs(); 
+    boolean bHasFinalIntegerArgument = doesCurrentFunctionHaveFinalIntegerArgument();
 
     // Invoke() the current shaping function, 
     // with the correct number and type(s) of arguments. 

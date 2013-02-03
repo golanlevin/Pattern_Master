@@ -4,7 +4,6 @@
 //------------------------------------------------------------------
 float function_PennerEaseInBack (float x) {
   functionName = "Penner's Ease-In Back";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
 
   float s = 1.70158;
   float y = x*x*((s+1.0)*x - s);
@@ -14,7 +13,6 @@ float function_PennerEaseInBack (float x) {
 //------------------------------------------------------------------
 float function_PennerEaseOutBack (float x) {
   functionName = "Penner's Ease-Out Back";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
 
   float s = 1.70158;
   x = x-1.0;
@@ -24,9 +22,7 @@ float function_PennerEaseOutBack (float x) {
 
 //------------------------------------------------------------------
 float function_PennerEaseInOutBack (float x) {
-
   functionName = "Penner's EaseInOut Back";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
 
   float s = 1.70158 * 1.525;
   x /= 0.5;
@@ -43,26 +39,19 @@ float function_PennerEaseInOutBack (float x) {
 }
 
 
-
 //------------------------------------------------------------------
 float function_PennerEaseInQuadratic (float t) {
   functionName = "Penner's EaseIn Quadratic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   return t*t;
 }
 //------------------------------------------------------------------
 float function_PennerEaseOutQuadratic (float t) {
   functionName = "Penner's EaseOut Quadratic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   return -1.0 *(t)*(t-2);
 }
 //------------------------------------------------------------------
 float function_PennerEaseInOutQuadratic (float t) {
   functionName = "Penner's EaseInOut Quadratic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   if ((t/=1.f/2) < 1) return 1.f/2*t*t;
   return -1.f/2 * ((--t)*(t-2) - 1);
 }
@@ -70,16 +59,12 @@ float function_PennerEaseInOutQuadratic (float t) {
 //------------------------------------------------------------------
 float function_PennerEaseInCubic (float x) {
   functionName = "Penner's EaseIn Cubic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   return x*x*x;
 }
 
 //------------------------------------------------------------------
 float function_PennerEaseOutCubic (float x) {
   functionName = "Penner's EaseOut Cubic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   x = x-1.0;
   return (x*x*x + 1);
 }
@@ -87,10 +72,8 @@ float function_PennerEaseOutCubic (float x) {
 
 //------------------------------------------------------------------
 float function_PennerEaseInOutCubic (float x) {
-
   functionName = "Penner's EaseInOut Cubic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
+  
   x *= 2.0; 
   float y = 0; 
 
@@ -108,16 +91,12 @@ float function_PennerEaseInOutCubic (float x) {
 //------------------------------------------------------------------
 float function_PennerEaseInQuartic (float t) {
   functionName = "Penner's EaseIn Quartic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   return t*t*t*t;
 }
 //------------------------------------------------------------------
 float function_PennerEaseOutQuartic (float t) {
   functionName = "Penner's EaseOut Quartic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
-  return -1 * ((t=t-1)*t*t*t - 1);
+  return -1.0 * ((t=t-1)*t*t*t - 1.0);
 }
 
 //------------------------------------------------------------------
@@ -125,22 +104,18 @@ float function_PennerEaseInOutQuartic (float t) {
   functionName = "Penner's EaseInOut Quartic";
   useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
 
-  if ((t/=1.f/2) < 1) return 1.f/2*t*t*t*t;
-  return -1.f/2 * ((t-=2)*t*t*t - 2);
+  if ((t/=1.0f/2.0) < 1) return 1.0f/2.0*t*t*t*t;
+  return -1.0f/2.0 * ((t-=2.0)*t*t*t - 2.0);
 }
 
 //------------------------------------------------------------------
 float function_PennerEaseInQuintic (float t) {
   functionName = "Penner's EaseIn Quintic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   return t*t*t*t*t;
 }
 //------------------------------------------------------------------
 float function_PennerEaseOutQuintic (float t) {
   functionName = "Penner's EaseOut Quintic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   t = t-1;
   return (t*t*t*t*t + 1.0);
 }
@@ -148,34 +123,25 @@ float function_PennerEaseOutQuintic (float t) {
 //------------------------------------------------------------------
 float function_PennerEaseInOutQuintic (float t) {
   functionName = "Penner's EaseInOut Quintic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   if ((t/=1.f/2) < 1) return 1.f/2*t*t*t*t*t;
   return 1.f/2*((t-=2)*t*t*t*t + 2);
 }
 
-
-
 //------------------------------------------------------------------
 float function_PennerEaseInSine (float t) {
   functionName = "Penner's EaseIn Sine";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   return -1.0 * cos(t * (PI/2)) + 1;
 }
+
 //------------------------------------------------------------------
 float function_PennerEaseOutSine(float t) {
   functionName = "Penner's EaseOut Sine";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   return sin(t * (PI/2));
 }
 
 //------------------------------------------------------------------
 float function_PennerEaseInOutSine(float t) {
   functionName = "Penner's EaseInOut Sine";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   return -0.5 * (cos(PI*t) - 1);
 }
 
@@ -185,37 +151,27 @@ float function_PennerEaseInOutSine(float t) {
 //------------------------------------------------------------------
 float function_PennerEaseInExpo(float t) {
   functionName = "Penner's EaseIn Exponential";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   return (t==0) ? 0 : pow(2, 10 * (t - 1));
 }
+
 //------------------------------------------------------------------
 float function_PennerEaseOutExpo(float t) {
   functionName = "Penner's EaseOut Exponential";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   return (t==1) ? 1 : (-pow(2, -10 * t) + 1);
 }
 
 //------------------------------------------------------------------
 float function_PennerEaseInOutExpo(float t) {
   functionName = "Penner's EaseInOut Exponential";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   if (t==0) return 0;
   if (t==1) return 1;
   if ((t/=1.f/2) < 1) return 1.f/2 * pow(2, 10 * (t - 1));
   return 1.f/2 * (-pow(2, -10 * --t) + 2);
 }
 
-
-
-
 //------------------------------------------------------------------
 float function_PennerEaseInElastic (float t) {
-
   functionName = "Penner's EaseIn Elastic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
 
   if (t==0) return 0; 
   if (t==1) return 1;
@@ -228,10 +184,8 @@ float function_PennerEaseInElastic (float t) {
 
 //------------------------------------------------------------------
 float function_PennerEaseOutElastic(float t) {
-
   functionName = "Penner's EaseOut Elastic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
+  
   if (t==0) return 0; 
   if ((t)==1) return 1;
   float p = 0.3f;
@@ -242,9 +196,7 @@ float function_PennerEaseOutElastic(float t) {
 
 //------------------------------------------------------------------
 float function_PennerEaseInOutElastic (float t) {
-
   functionName = "Penner's EaseInOut Elastic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
 
   if (t==0) return 0; 
   if ((t/=0.5)==2) return 1;
@@ -265,7 +217,6 @@ float function_PennerEaseInOutElastic (float t) {
 //------------------------------------------------------------------
 float function_PennerEaseOutBounce (float t) {
   functionName = "Penner's EaseOut Bounce";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
 
   if ((t) < (1/2.75f)) {
     return (7.5625f* t*t);
@@ -287,16 +238,12 @@ float function_PennerEaseOutBounce (float t) {
 //------------------------------------------------------------------
 float function_PennerEaseInBounce (float t) {
   functionName = "Penner's EaseIn Bounce";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   return 1.0 - function_PennerEaseOutBounce (1.0-t);
 }
 
 //------------------------------------------------------------------
 float function_PennerEaseInOutBounce(float t) {
   functionName = "Penner's EaseInOut Bounce";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
-
   if (t < 0.5) return function_PennerEaseInBounce (t*2) * .5f;
   else return function_PennerEaseOutBounce (t*2-1) * .5f + .5f;
 }
@@ -304,9 +251,6 @@ float function_PennerEaseInOutBounce(float t) {
 //------------------------------------------------------------------
 float function_Staircase (float x, int n) {
   functionName = "Staircase";
-  useParameterA = useParameterB = useParameterC = useParameterD = false; 
-  useParameterN = true;
-
   float y = floor(x*n) / (float)(n-1);
   return y;
 }
@@ -314,15 +258,9 @@ float function_Staircase (float x, int n) {
 //------------------------------------------------------------------
 float function_ExponentialSmoothedStaircase (float x, float a, int n) {
   functionName = "Smoothed Exponential Staircase";
-  // http://web.mit.edu/fnl/volume/204/winston.html
-  useParameterA = true;
-  useParameterB = useParameterC = useParameterD = false; 
-  useParameterN = true;
+  // See http://web.mit.edu/fnl/volume/204/winston.html
   
-  
-  float fa =  sq(map(a,0,1, 5,30));
-  
-
+  float fa = sq (map(a, 0,1, 5,30));
   float y = 0; 
   for (int i=0; i<n; i++){
     y += (1.0/(n-1.0))/ (1.0 + exp(fa*(((i+1.0)/n) - x)));
@@ -337,15 +275,13 @@ float function_ExponentialSmoothedStaircase (float x, float a, int n) {
 float function_Gompertz (float x, float a) {
   // http://en.wikipedia.org/wiki/Gompertz_curve
   functionName = "Gompertz Function";
-  useParameterA = true; 
-  useParameterB = useParameterC = useParameterD = useParameterN = false; 
-
+  
   float epsilon = 0.00001;
   float min_param_a = 0.0 + epsilon;
   a = max(a, min_param_a); 
 
   float b = -8.0;
-  float c = 0 - a*16;
+  float c = 0 - a*16.0;
   float y = exp( b * exp(c * x));
 
   float maxVal = exp(b * exp(c));

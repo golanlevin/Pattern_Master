@@ -8,11 +8,6 @@ float m_dRadius;
 //==============================================================
 float function_CircularArcThroughAPoint (float x, float a, float b){
   functionName = "Circular Arc Through a Given Point";
-  useParameterA = true;
-  useParameterB = true;
-  useParameterC = false;
-  useParameterD = false;
-  useParameterN = false;
   
   float epsilon = 0.00001;
   float min_param_a = 0.0 + epsilon;
@@ -30,12 +25,12 @@ float function_CircularArcThroughAPoint (float x, float a, float b){
   float pt3x = 1;
   float pt3y = 1;
 
-  if      (!IsPerpendicular(pt1x,pt1y, pt2x,pt2y, pt3x,pt3y) )		calcCircleFrom3Points (pt1x,pt1y, pt2x,pt2y, pt3x,pt3y);	
-  else if (!IsPerpendicular(pt1x,pt1y, pt3x,pt3y, pt2x,pt2y) )		calcCircleFrom3Points (pt1x,pt1y, pt3x,pt3y, pt2x,pt2y);	
-  else if (!IsPerpendicular(pt2x,pt2y, pt1x,pt1y, pt3x,pt3y) )		calcCircleFrom3Points (pt2x,pt2y, pt1x,pt1y, pt3x,pt3y);	
-  else if (!IsPerpendicular(pt2x,pt2y, pt3x,pt3y, pt1x,pt1y) )		calcCircleFrom3Points (pt2x,pt2y, pt3x,pt3y, pt1x,pt1y);	
-  else if (!IsPerpendicular(pt3x,pt3y, pt2x,pt2y, pt1x,pt1y) )		calcCircleFrom3Points (pt3x,pt3y, pt2x,pt2y, pt1x,pt1y);	
-  else if (!IsPerpendicular(pt3x,pt3y, pt1x,pt1y, pt2x,pt2y) )		calcCircleFrom3Points (pt3x,pt3y, pt1x,pt1y, pt2x,pt2y);	
+  if      (!IsPerpendicular(pt1x,pt1y, pt2x,pt2y, pt3x,pt3y) )	calcCircleFrom3Points (pt1x,pt1y, pt2x,pt2y, pt3x,pt3y);	
+  else if (!IsPerpendicular(pt1x,pt1y, pt3x,pt3y, pt2x,pt2y) )	calcCircleFrom3Points (pt1x,pt1y, pt3x,pt3y, pt2x,pt2y);	
+  else if (!IsPerpendicular(pt2x,pt2y, pt1x,pt1y, pt3x,pt3y) )	calcCircleFrom3Points (pt2x,pt2y, pt1x,pt1y, pt3x,pt3y);	
+  else if (!IsPerpendicular(pt2x,pt2y, pt3x,pt3y, pt1x,pt1y) )	calcCircleFrom3Points (pt2x,pt2y, pt3x,pt3y, pt1x,pt1y);	
+  else if (!IsPerpendicular(pt3x,pt3y, pt2x,pt2y, pt1x,pt1y) )	calcCircleFrom3Points (pt3x,pt3y, pt2x,pt2y, pt1x,pt1y);	
+  else if (!IsPerpendicular(pt3x,pt3y, pt1x,pt1y, pt2x,pt2y) )	calcCircleFrom3Points (pt3x,pt3y, pt1x,pt1y, pt2x,pt2y);	
   else { 
     return 0;
   }

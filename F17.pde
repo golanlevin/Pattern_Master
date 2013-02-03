@@ -3,11 +3,6 @@
 //------------------------------------------------------------------
 float function_DoubleCircleSeat (float x, float a){
   functionName = "Double-Circular Seat";
-  useParameterA = true;
-  useParameterB = false;
-  useParameterC = false;
-  useParameterD = false;
-  useParameterN = false;
   
   float min_param_a = 0.0;
   float max_param_a = 1.0;

@@ -3,12 +3,7 @@
 //------------------------------------------------------------------
 float function_DoubleLinear (float x, float a, float b){
   functionName = "Double-Linear";
-  useParameterA = true;
-  useParameterB = true;
-  useParameterC = false;
-  useParameterD = false;
-  useParameterN = false;
-
+  
   float epsilon = 0.00001;
   float min_param_a = 0.0 + epsilon;
   float max_param_a = 1.0 - epsilon;
