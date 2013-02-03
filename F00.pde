@@ -102,7 +102,6 @@ float function_PennerEaseOutQuartic (float t) {
 //------------------------------------------------------------------
 float function_PennerEaseInOutQuartic (float t) {
   functionName = "Penner's EaseInOut Quartic";
-  useParameterA = useParameterB = useParameterC = useParameterD = useParameterN = false;
 
   if ((t/=1.0f/2.0) < 1) return 1.0f/2.0*t*t*t*t;
   return -1.0f/2.0 * ((t-=2.0)*t*t*t - 2.0);

@@ -50,12 +50,6 @@ float probe_x = 0.5;
 float probe_y = 0.5;
 float animationConstant = 1000.0;
 
-boolean useParameterA = true;
-boolean useParameterB = true;
-boolean useParameterC = true;
-boolean useParameterD = true;
-boolean useParameterN = true;
-
 boolean visited = false;
 boolean bClickedInGraph = false;
 String functionName = "";
@@ -131,7 +125,9 @@ void mouseReleased() {
 //====================================================
 void drawPDF() {
 
+   
   String pdfFilename = functionName;
+  /*
   if (useParameterA) { 
     pdfFilename += "_a=" + nf(param_a, 1, 2);
   }
@@ -147,6 +143,7 @@ void drawPDF() {
   if (useParameterN) { 
     pdfFilename += "_n=" + nf(param_n, 1, 2);
   }
+  */
   pdfFilename += ".pdf";
 
 
