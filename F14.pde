@@ -7,7 +7,6 @@
 float function_QuadraticBezier (float x, float a, float b){
   functionName = "Quadratic Bezier";
 
-  float epsilon = 0.00001;
   float min_param_a = 0.0;
   float max_param_a = 1.0;
   float min_param_b = 0.0;
@@ -16,7 +15,7 @@ float function_QuadraticBezier (float x, float a, float b){
   b = constrain(b, min_param_b, max_param_b); 
 
   if (a == 0.5){
-    a += epsilon;
+    a += EPSILON;
   }
   // solve t from x (an inverse operation)
   float om2a = 1.0 - 2.0*a;
@@ -30,13 +29,12 @@ float function_QuadraticBezier (float x, float a, float b){
 float function_CubicBezier (float x, float a, float b, float c, float d){
   functionName = "Cubic Bezier";
 
-  float epsilon = 0.00001;
-  float min_param_a = 0.0 + epsilon;
-  float max_param_a = 1.0 - epsilon;
+  float min_param_a = 0.0 + EPSILON;
+  float max_param_a = 1.0 - EPSILON;
   float min_param_b = 0.0;
   float max_param_b = 1.0;
-  float min_param_c = 0.0 + epsilon;
-  float max_param_c = 1.0 - epsilon;
+  float min_param_c = 0.0 + EPSILON;
+  float max_param_c = 1.0 - EPSILON;
   float min_param_d = 0.0;
   float max_param_d = 1.0;
   a = constrain(a, min_param_a, max_param_a); 

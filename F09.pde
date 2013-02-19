@@ -598,9 +598,8 @@ float function_GeneralizedTriangleWindow (float x, float a) {
   functionName = "Generalized Triangle Window";
  
   float y = 0; 
-  float epsilon = 0.00001;
-  float min_param_a = 0.0 + epsilon;
-  float max_param_a = 1.0 - epsilon;
+  float min_param_a = 0.0 + EPSILON;
+  float max_param_a = 1.0 - EPSILON;
   a = constrain(a, min_param_a, max_param_a); 
   
   if (x < a){

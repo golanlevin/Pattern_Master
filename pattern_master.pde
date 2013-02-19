@@ -84,7 +84,7 @@ void setup() {
   size (scrW, scrH);// OPENGL);
   // println("App dimensions: " + scrW + " x " + scrH);
 
-
+   
   initHistories();
   introspect();
 }

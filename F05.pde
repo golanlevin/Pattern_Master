@@ -1,12 +1,11 @@
 // Double-Cubic Seat 
 
 //------------------------------------------------------------------
-float function_DoubleCubicSeat (float x, float a, float b){
-  functionName = "Double-Cubic Seat";
+float function_DoubleCubicOgee (float x, float a, float b){
+  functionName = "Double-Cubic Ogee";
   
-  float epsilon = 0.00001;
-  float min_param_a = 0.0 + epsilon;
-  float max_param_a = 1.0 - epsilon;
+  float min_param_a = 0.0 + EPSILON;
+  float max_param_a = 1.0 - EPSILON;
   float min_param_b = 0.0;
   float max_param_b = 1.0;
 

@@ -1,12 +1,11 @@
 // Symmetric Double-Exponential Seat
 
 //------------------------------------------------------------------
-float function_DoubleExponentialSeat (float x, float a){
-  functionName = "Double-Exponential Seat";
+float function_DoubleExponentialOgee (float x, float a){
+  functionName = "Double-Exponential Ogee";
 
-  float epsilon = 0.00001;
-  float min_param_a = 0.0 + epsilon;
-  float max_param_a = 1.0 - epsilon;
+  float min_param_a = 0.0 + EPSILON;
+  float max_param_a = 1.0 - EPSILON;
   a = constrain(a, min_param_a, max_param_a); 
 
   float y = 0;

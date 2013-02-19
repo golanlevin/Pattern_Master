@@ -9,14 +9,13 @@ float m_dRadius;
 float function_CircularArcThroughAPoint (float x, float a, float b){
   functionName = "Circular Arc Through a Given Point";
   
-  float epsilon = 0.00001;
-  float min_param_a = 0.0 + epsilon;
-  float max_param_a = 1.0 - epsilon;
-  float min_param_b = 0.0 + epsilon;
-  float max_param_b = 1.0 - epsilon;
+  float min_param_a = 0.0 + EPSILON;
+  float max_param_a = 1.0 - EPSILON;
+  float min_param_b = 0.0 + EPSILON;
+  float max_param_b = 1.0 - EPSILON;
   a = constrain(a, min_param_a, max_param_a); 
   b = constrain(b, min_param_b, max_param_b); 
-  x = constrain(x, 0+epsilon,1-epsilon);
+  x = constrain(x, 0+EPSILON,1-EPSILON);
   
   float pt1x = 0;
   float pt1y = 0;
@@ -71,22 +70,21 @@ float pt3x, float pt3y)
   float xDelta_a = pt2x - pt1x;
   float yDelta_b = pt3y - pt2y;
   float xDelta_b = pt3x - pt2x;
-  float epsilon = 0.000001;
 
   // checking whether the line of the two pts are vertical
-  if (abs(xDelta_a) <= epsilon && abs(yDelta_b) <= epsilon){
+  if (abs(xDelta_a) <= EPSILON && abs(yDelta_b) <= EPSILON){
     return false;
   }
-  if (abs(yDelta_a) <= epsilon){
+  if (abs(yDelta_a) <= EPSILON){
     return true;
   }
-  else if (abs(yDelta_b) <= epsilon){
+  else if (abs(yDelta_b) <= EPSILON){
     return true;
   }
-  else if (abs(xDelta_a)<= epsilon){
+  else if (abs(xDelta_a)<= EPSILON){
     return true;
   }
-  else if (abs(xDelta_b)<= epsilon){
+  else if (abs(xDelta_b)<= EPSILON){
     return true;
   }
   else return false;
@@ -103,9 +101,8 @@ float pt3x, float pt3y)
   float xDelta_a = pt2x - pt1x;
   float yDelta_b = pt3y - pt2y;
   float xDelta_b = pt3x - pt2x;
-  float epsilon = 0.000001;
 
-  if (abs(xDelta_a) <= epsilon && abs(yDelta_b) <= epsilon){
+  if (abs(xDelta_a) <= EPSILON && abs(yDelta_b) <= EPSILON){
     m_Centerx = 0.5*(pt2x + pt3x);
     m_Centery = 0.5*(pt1y + pt2y);
     m_dRadius = sqrt(sq(m_Centerx-pt1x) + sq(m_Centery-pt1y));
@@ -115,7 +112,7 @@ float pt3x, float pt3y)
   // IsPerpendicular() assure that xDelta(s) are not zero
   float aSlope = yDelta_a / xDelta_a; 
   float bSlope = yDelta_b / xDelta_b;
-  if (abs(aSlope-bSlope) <= epsilon){	// checking whether the given points are colinear. 	
+  if (abs(aSlope-bSlope) <= EPSILON){	// checking whether the given points are colinear. 	
     return;
   }
 

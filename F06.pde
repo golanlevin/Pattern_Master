@@ -1,12 +1,6 @@
-// Double-Circle sigmoid
-
 //------------------------------------------------------------------
-float function_DoubleCircleSigmoid (float x, float a) {
+float function_DoubleCircularSigmoid (float x, float a) {
   functionName = "Double-Circular Sigmoid";
-  
-  float min_param_a = 0.0;
-  float max_param_a = 1.0;
-  a = constrain(a, min_param_a, max_param_a); 
   
   float y = 0;
   if (x<=a) {
@@ -14,6 +8,21 @@ float function_DoubleCircleSigmoid (float x, float a) {
   } 
   else {
     y = a + sqrt(sq(1.0-a) - sq(x-1.0));
+  }
+  return y;
+}
+
+//------------------------------------------------------------------
+float function_DoubleSquircularSigmoid (float x, float a, int n) {
+  functionName = "Double-Squircular Sigmoid";
+ 
+  float pwn = max(2, n * 2.0); 
+  float y = 0;
+  if (x<=a) {
+    y = a - pow( pow(a,pwn) - pow(x,pwn), 1.0/pwn);
+  } 
+  else {
+    y = a + pow(pow(1.0-a, pwn) - pow(x-1.0, pwn), 1.0/pwn);
   }
   return y;
 }

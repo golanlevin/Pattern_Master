@@ -278,9 +278,8 @@ float function_ExponentialSmoothedStaircase (float x, float a, int n) {
 float function_Gompertz (float x, float a) {
   // http://en.wikipedia.org/wiki/Gompertz_curve
   functionName = "Gompertz Function";
-  
-  float epsilon = 0.00001;
-  float min_param_a = 0.0 + epsilon;
+ 
+  float min_param_a = 0.0 + EPSILON;
   a = max(a, min_param_a); 
 
   float b = -8.0;

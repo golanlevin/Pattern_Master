@@ -5,11 +5,10 @@ float function_CubicBezierThrough2Points (float x, float a, float b, float c, fl
 
   float y = 0;
 
-  float epsilon = 0.00001;
-  float min_param_a = 0.0 + epsilon;
-  float max_param_a = 1.0 - epsilon;
-  float min_param_b = 0.0 + epsilon;
-  float max_param_b = 1.0 - epsilon;
+  float min_param_a = 0.0 + EPSILON;
+  float max_param_a = 1.0 - EPSILON;
+  float min_param_b = 0.0 + EPSILON;
+  float max_param_b = 1.0 - EPSILON;
   a = constrain(a, min_param_a, max_param_a); 
   b = constrain(b, min_param_b, max_param_b); 
 
@@ -45,8 +44,8 @@ float function_CubicBezierThrough2Points (float x, float a, float b, float c, fl
   x1 = (ccx - x2*B2t1) / B1t1;
   y1 = (ccy - y2*B2t1) / B1t1;
 
-  x1 = constrain(x1, 0+epsilon,1-epsilon); 
-  x2 = constrain(x2, 0+epsilon,1-epsilon); 
+  x1 = constrain(x1, 0+EPSILON,1-EPSILON); 
+  x2 = constrain(x2, 0+EPSILON,1-EPSILON); 
 
   y = function_CubicBezier (x, x1,y1, x2,y2);
   y = constrain(y,0,1); 

@@ -12,11 +12,10 @@ float arcRadius;
 float function_CircularFillet (float x, float a, float b, float c) {
   functionName = "Double-Linear with Circular Fillet";
 
-  float epsilon = 0.00001;
-  float min_param_a = 0.0 + epsilon;
-  float max_param_a = 1.0 - epsilon;
-  float min_param_b = 0.0 + epsilon;
-  float max_param_b = 1.0 - epsilon;
+  float min_param_a = 0.0 + EPSILON;
+  float max_param_a = 1.0 - EPSILON;
+  float min_param_b = 0.0 + EPSILON;
+  float max_param_b = 1.0 - EPSILON;
   a = constrain(a, min_param_a, max_param_a); 
   b = constrain(b, min_param_b, max_param_b); 
 
@@ -28,7 +27,7 @@ float function_CircularFillet (float x, float a, float b, float c) {
   x = constrain(x, 0, 1); 
 
   if (x <= arcStartX) {
-    if (arcStartX < epsilon){
+    if (arcStartX < EPSILON){
       y = 0;
     } else {
       t = x / arcStartX;

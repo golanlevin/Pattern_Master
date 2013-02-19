@@ -1,8 +1,8 @@
 // Simplified Double-Cubic Seat
 
 //------------------------------------------------------------------
-float function_DoubleCubicSeatSimplified (float x, float a, float b){
-  functionName = "Simplified Double-Cubic Seat";
+float function_DoubleCubicOgeeSimplified (float x, float a, float b){
+  functionName = "Simplified Double-Cubic Ogee";
   b = 1 - b; //reverse, for intelligibility.
   
   float y = 0;
