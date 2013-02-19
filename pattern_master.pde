@@ -3,17 +3,15 @@
 // Spring 2006 - January 2013
 
 
-// TO DO
-// Ogee Curves
+// TO DO:
 // http://engineeringtraining.tpub.com/14069/css/14069_150.htm
 // http://en.wikipedia.org/wiki/Generalised_logistic_function Richard's Curve
 // http://en.wikipedia.org/wiki/Probit_function
 // http://mathworld.wolfram.com/HeavisideStepFunction.html
 // generalized damped sinusoid
-//
-// RESTORE MODE-SPECIFIC GRAPHICS!!!
 
-// Imports for introspection, so we know the functions' arguments. 
+
+// Java imports for introspection, so we know the functions' arguments. 
 import java.lang.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -84,7 +82,7 @@ void setup() {
   size (scrW, scrH);// OPENGL);
   // println("App dimensions: " + scrW + " x " + scrH);
 
-   
+
   initHistories();
   introspect();
 }
@@ -125,25 +123,25 @@ void mouseReleased() {
 //====================================================
 void drawPDF() {
 
-   
+
   String pdfFilename = functionName;
   /*
   if (useParameterA) { 
-    pdfFilename += "_a=" + nf(param_a, 1, 2);
-  }
-  if (useParameterB) { 
-    pdfFilename += "_b=" + nf(param_b, 1, 2);
-  }
-  if (useParameterC) { 
-    pdfFilename += "_c=" + nf(param_c, 1, 2);
-  }
-  if (useParameterD) { 
-    pdfFilename += "_d=" + nf(param_d, 1, 2);
-  }
-  if (useParameterN) { 
-    pdfFilename += "_n=" + nf(param_n, 1, 2);
-  }
-  */
+   pdfFilename += "_a=" + nf(param_a, 1, 2);
+   }
+   if (useParameterB) { 
+   pdfFilename += "_b=" + nf(param_b, 1, 2);
+   }
+   if (useParameterC) { 
+   pdfFilename += "_c=" + nf(param_c, 1, 2);
+   }
+   if (useParameterD) { 
+   pdfFilename += "_d=" + nf(param_d, 1, 2);
+   }
+   if (useParameterN) { 
+   pdfFilename += "_n=" + nf(param_n, 1, 2);
+   }
+   */
   pdfFilename += ".pdf";
 
 
@@ -456,7 +454,6 @@ class DataHistoryGraph {
     }
     endShape();
   }
-  
 }
 
 
@@ -469,19 +466,19 @@ void initHistories() {
 
 
 //-----------------------------------------------------
-void drawNoiseHistories(){
-  
+void drawNoiseHistories() {
+
   // update with the latest incoming values
   int nData = (int)xscale;
   float noiseVal = noise(millis()/ (nData/2.0));
   float cosVal   = 0.5 + (0.45 * cos(PI * millis()/animationConstant));
   noiseHistory.update( noiseVal ); 
   cosHistory.update( cosVal );  
-  
+
   float nhy = margin0 + bandTh + margin1 + yscale + margin2;
   float chy = margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin1;
   noiseHistory.draw ( xoffset, nhy); 
-  cosHistory.draw   ( xoffset, chy); 
+  cosHistory.draw   ( xoffset, chy);
 }
 
 
@@ -558,7 +555,7 @@ void drawModeSpecificGraphics() {
 
   switch (nParams) {
   case 2:
-    if (methodName.equals("function_AdjustableFwhmHalfGaussian") ||
+    if ( methodName.equals("function_AdjustableFwhmHalfGaussian") ||
       methodName.equals("function_AdjustableSigmaHalfGaussian")) {
       x = xoffset + param_a * xscale;
       float val = 1.0 - function (param_a, param_a, param_b, param_c, param_d, param_n);
@@ -638,108 +635,6 @@ void drawModeSpecificGraphics() {
     break;
   }
 
-
-
-  /*
-  "function_AdjustableFwhmHalfGaussian"
-   "function_AdjustableSigmaHalfGaussian"
-   "function_DoubleLinear"
-   "function_DoubleCircleSeat"
-   "function_DoubleEllipticSeat"
-   "function_DoubleCubicSeat"
-   "function_DoubleCubicSeatSimplified"
-   "function_DoubleOddPolynomialSeat"
-   "function_DoubleExponentialSeat"
-   "function_DoubleCircleSigmoid"
-   "function_DoubleEllipticSigmoid"
-   "function_RaisedInvertedCosine"
-   "function_BlinnWyvillCosineApproximation"
-   "function_DoubleQuadraticSigmoid"
-   "function_DoublePolynomialSigmoid"
-   "function_DoubleExponentialSigmoid"
-   "function_ExponentialEmphasis"
-   "function_NiftyQuartic"
-   "function_NormalizedLogisticSigmoid"
-   "function_CircularFillet"
-   "function_CircularArcThroughAPoint"
-   "function_CubicBezierThrough2Points"
-   "function_ParabolaThroughAPoint"
-   "function_QuadraticBezier"
-   "function_CubicBezier"
-   "function_Identity"
-   "function_CircularEaseIn"
-   "function_CircularEaseOut"
-   "function_SmoothStep"
-   "function_SmootherStep"
-   "function_MaclaurinCos"
-   "function_CatmullRomInterpolate"
-   "function_HermiteAdvanced"
-   "function_NormalizedErf"
-   "function_NormalizedInverseErf"
-   "function_SimpleHalfGaussian"
-   "function_HalfGaussianThroughAPoint"
-   "function_PennerEaseInBack"
-   "function_PennerEaseOutBack"
-   "function_PennerEaseInOutBack"
-   "function_CircularEaseInOut"
-   "function_PennerEaseInQuadratic"
-   "function_PennerEaseOutQuadratic"
-   "function_PennerEaseInOutQuadratic"
-   "function_PennerEaseInCubic"
-   "function_PennerEaseOutCubic"
-   "function_PennerEaseInOutCubic"
-   "function_PennerEaseInQuartic"
-   "function_PennerEaseOutQuartic"
-   "function_PennerEaseInOutQuartic"
-   "function_PennerEaseInQuintic"
-   "function_PennerEaseOutQuintic"
-   "function_PennerEaseInOutQuintic"
-   "function_PennerEaseInElastic"
-   "function_PennerEaseOutElastic"
-   "function_PennerEaseInOutElastic"
-   "function_PennerEaseInExpo"
-   "function_PennerEaseOutExpo"
-   "function_PennerEaseInOutExpo"
-   "function_PennerEaseInSine"
-   "function_PennerEaseOutSine"
-   "function_PennerEaseInOutSine"
-   "function_PennerEaseInBounce"
-   "function_PennerEaseOutBounce"
-   "function_PennerEaseInOutBounce"
-   "function_HalfLanczosSincWindow"
-   "function_HalfNuttallWindow"
-   "function_HalfBlackmanNuttallWindow"
-   "function_HalfBlackmanHarrisWindow"
-   "function_HalfExactBlackmanWindow"
-   "function_HalfGeneralizedBlackmanWindow"
-   "function_HalfFlatTopWindow"
-   "function_HalfBartlettHannWindow"
-   "function_BartlettWindow"
-   "function_CosineWindow"
-   "function_TukeyWindow"
-   "function_AdjustableSigmaGaussian"
-   "function_LanczosSincWindow"
-   "function_NuttallWindow"
-   "function_BlackmanNuttallWindow"
-   "function_BlackmanHarrisWindow"
-   "function_ExactBlackmanWindow"
-   "function_GeneralizedBlackmanWindow"
-   "function_FlatTopWindow"
-   "function_BartlettHannWindow"
-   "function_HannWindow"
-   "function_HammingWindow"
-   "function_Staircase"
-   "function_Gompertz"
-   "function_NormalizedLogit"
-   "function_GeneralSigmoidLogitCombo"
-   "function_GeneralizedLinearMap"
-   "function_AdjustableCenterCosineWindow"
-   "function_AdjustableCenterEllipticWindow"
-   "function_ExponentialSmoothedStaircase"
-   "function_Inverse"
-   "function_SlidingAdjustableSigmaGaussian"
-   "function_Hermite"
-   */
 }
 
 //===============================================================
@@ -916,336 +811,6 @@ float function (float x, float a, float b, float c, float d, int n) {
  }
  */
 
-/*
-  case 2:
- out = function_DoubleEllipticSeat (x, a, b); 
- break;
- case 3:
- out = function_DoubleCubicSeat (x, a, b);
- break;
- case 4: 
- out = function_DoubleCubicSeatSimplified (x, a, b);
- break;
- case 5: 
- out = function_DoubleOddPolynomialSeat (x, a, b, n);   
- break;
- case 6:
- out = function_DoubleExponentialSeat (x, a);
- break;
- case 7:
- out = function_DoubleCircleSigmoid (x, a);
- break;
- case 8: 
- out = function_DoubleEllipticSigmoid (x, a, b);
- break;
- case 9: 
- out = function_RaisedInvertedCosine (x);
- break;
- case 10: 
- out = function_BlinnWyvillCosineApproximation (x);
- break;
- case 11:
- out = function_DoubleQuadraticSigmoid (x);
- break;
- case 12:
- out = function_DoublePolynomialSigmoid  (x, a, b, n);
- break;
- case 13:
- out = function_DoubleExponentialSigmoid (x, a);
- break;
- case 14:
- out = function_ExponentialEmphasis (x, a);
- break;
- case 15:
- out = function_NiftyQuartic (x, a, b); 
- break;
- 
- case 16:
- out = function_NormalizedLogisticSigmoid (x, a);  
- break;
- case 17:
- out = function_CircularFillet (x, a, b, d);
- break;
- case 18:
- out = function_CircularArcThroughAPoint (x, a, b);  
- break;
- 
- case 19:
- out = function_CubicBezierThrough2Points (x, a, b, c, d);
- break;
- case 20:
- out = function_ParabolaThroughAPoint (x, a, b);
- break;
- case 21:
- out = function_QuadraticBezier (x, a, b);
- break;
- case 22:
- out = function_CubicBezier (x, a, b, c, d);
- break;
- case 23: 
- out = function_Identity(x);
- break;
- case 24: 
- out =  function_CircularEaseIn(x);
- break;
- case 25:
- out =  function_CircularEaseOut(x);
- break;
- 
- case 26:
- out = function_SmoothStep(x); 
- break;
- case 27:
- out = function_SmootherStep(x); 
- break;
- case 28:
- out = function_MaclaurinCos(x); 
- break;
- 
- case 29: 
- out = function_CatmullRomInterpolate (x, a, b);
- break;
- case 30: 
- out = function_HermiteAdvanced (x, a, b);
- break;
- case 31: 
- out = function_NormalizedErf(x); 
- break;
- case 32:
- out = function_NormalizedInverseErf(x); 
- break;
- 
- case 33: 
- out = function_SimpleHalfGaussian (x); 
- break;
- case 34: 
- out = function_AdjustableFwhmHalfGaussian (x, a); 
- break;
- case 35: 
- out = function_AdjustableSigmaHalfGaussian (x, a); 
- break;
- case 36:
- out = function_HalfGaussianThroughAPoint (x, a, b); 
- break;
- 
- case 37:
- out = function_PennerEaseInBack (x); 
- break;
- case 38: 
- out = function_PennerEaseOutBack (x); 
- break; 
- case 39:
- out = function_PennerEaseInOutBack (x); 
- break;
- case 40: 
- out = function_CircularEaseInOut (x);
- break;
- 
- case 41: 
- out = function_PennerEaseInQuadratic (x); 
- break;
- case 42: 
- out = function_PennerEaseOutQuadratic (x); 
- break; 
- case 43: 
- out = function_PennerEaseInOutQuadratic (x); 
- break;  
- 
- case 44:
- out = function_PennerEaseInCubic (x); 
- break;
- case 45:
- out = function_PennerEaseOutCubic (x); 
- break;
- case 46: 
- out = function_PennerEaseInOutCubic (x); 
- break;
- 
- case 47: 
- out = function_PennerEaseInQuartic (x); 
- break;
- case 48: 
- out = function_PennerEaseOutQuartic (x); 
- break;
- case 49: 
- out = function_PennerEaseInOutQuartic (x); 
- break;
- 
- case 50: 
- out = function_PennerEaseInQuintic (x); 
- break; 
- case 51: 
- out = function_PennerEaseOutQuintic (x); 
- break; 
- case 52: 
- out = function_PennerEaseInOutQuintic (x); 
- break; 
- 
- case 53: 
- out = function_PennerEaseInElastic (x); 
- break;
- case 54:
- out = function_PennerEaseOutElastic (x); 
- break;
- case 55:
- out = function_PennerEaseInOutElastic (x); 
- break;
- 
- 
- 
- case 56: 
- out = function_PennerEaseInExpo (x); 
- break;
- case 57: 
- out = function_PennerEaseOutExpo (x); 
- break;
- case 58: 
- out = function_PennerEaseInOutExpo (x); 
- break;
- 
- case 59: 
- out = function_PennerEaseInSine (x); 
- break;
- case 60: 
- out = function_PennerEaseOutSine (x); 
- break;
- case 61: 
- out = function_PennerEaseInOutSine (x); 
- break;
- 
- 
- case 62: 
- out = function_PennerEaseInBounce (x); 
- break;
- case 63: 
- out = function_PennerEaseOutBounce (x); 
- break;
- case 64: 
- out = function_PennerEaseInOutBounce (x); 
- break;
- 
- 
- case 65: 
- out = function_HalfLanczosSincWindow (x); 
- break;
- case 66:
- out = function_HalfNuttallWindow (x); 
- break;
- case 67:
- out = function_HalfBlackmanNuttallWindow (x); 
- break;
- case 68:
- out = function_HalfBlackmanHarrisWindow (x); 
- break;
- case 69: 
- out = function_HalfExactBlackmanWindow (x); 
- break;
- case 70:
- out = function_HalfGeneralizedBlackmanWindow (x, a); 
- break;
- case 71: 
- out = function_HalfFlatTopWindow (x); 
- break;
- case 72: 
- out = function_HalfBartlettHannWindow (x); 
- break;
- 
- case 73: 
- out = function_BartlettWindow (x); 
- break;
- case 74: 
- out = function_CosineWindow (x);
- break;
- case 75: 
- out = function_TukeyWindow (x, a); 
- break;
- 
- 
- case 76: 
- out = function_AdjustableSigmaGaussian (x, a); 
- break;
- case 77: 
- out = function_LanczosSincWindow (x); 
- break;
- case 78: 
- out = function_NuttallWindow (x); 
- break;
- case 79: 
- out = function_BlackmanNuttallWindow (x); 
- break;
- case 80: 
- out = function_BlackmanHarrisWindow (x); 
- break;
- case 81: 
- out = function_ExactBlackmanWindow (x); 
- break;
- case 82: 
- out = function_GeneralizedBlackmanWindow (x, a); 
- break;
- case 83: 
- out = function_FlatTopWindow (x); 
- break;
- case 84: 
- out = function_BartlettHannWindow (x); 
- break;
- case 85: 
- out = function_HannWindow (x); 
- break;  
- case 86: 
- out = function_HammingWindow (x); 
- break;
- case 87: 
- out = functionGeneralizedTriangleWindow (x, a); 
- break;
- case 88: 
- out = functionPoissonWindow (x, a); 
- break;
- case 89: 
- out = functionHannPoissonWindow (x, a); 
- break;
- case 90: 
- param_n = 7;
- out = function_Staircase (x, param_n); 
- break;
- case 91: 
- out = function_Gompertz (x, a); 
- break;
- 
- case 92: 
- out = function_NormalizedLogit (x, a); 
- break;
- case 93: 
- out = function_NormalizedLogisticSigmoid (x, a); 
- break;
- case 94: 
- out = function_GeneralSigmoidLogitCombo (x, a, b); 
- break;  
- 
- case 95: 
- out = function_GeneralizedLinearMap (x, a, b, c, d);
- break;
- case 96:
- out = function_AdjustableCenterCosineWindow (x, a);
- break;
- case 97: 
- out = function_AdjustableCenterEllipticWindow (x, a);
- break;
- case 98: 
- param_n = 7;
- out = function_ExponentialSmoothedStaircase (x, a, param_n);
- break;
- 
- case 99: 
- out = function_Inverse (x); 
- break;
- case 100: 
- out = function_SlidingAdjustableSigmaGaussian (x, a, b); 
- break;
- }
- return out;
- }
- 
- */
 
 /////////////////////////////////////////////////////////////////////////
 //
