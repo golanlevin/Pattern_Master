@@ -81,8 +81,7 @@ void setup() {
   int scrH = (int)(margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin0 + bandTh + margin1);
   size (scrW, scrH);// OPENGL);
   // println("App dimensions: " + scrW + " x " + scrH);
-
-
+  
   initHistories();
   introspect();
 }

@@ -19,6 +19,11 @@ float function_GeneralSigmoidLogitCombo (float x, float a, float b){
   return y;
 }
 
+
+
+
+
+
 //------------------------------------------------------------------
 float function_NormalizedLogisticSigmoid (float x, float a) {
   functionName = "Normalized Logistic Sigmoid";

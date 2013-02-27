@@ -19,6 +19,31 @@ float function_DoubleExponentialSigmoid (float x, float a){
   return y;
 }
 
+
+
+//------------------------------------------------------------------
+float function_AdjustableCenterDoubleExponentialSigmoid (float x, float a, float b){
+  
+  functionName = "Adjustable-Center Double-Exponential Sigmoid";
+  
+  float min_param_a = 0.0 + EPSILON;
+  float max_param_a = 1.0 - EPSILON;
+  a = constrain(a, min_param_a, max_param_a); 
+  a = 1-a;
+  
+  float y = 0;
+  float w = max(0, min(1, x-(b-0.5)));
+  if (w<=0.5){
+    y = (pow(2.0*w, 1.0/a))/2.0;
+  } 
+  else {
+    y = 1.0 - (pow(2.0*(1.0-w), 1.0/a))/2.0;
+  }
+  return y;
+}
+
+
+
 //------------------------------------------------------------------
 float function_DoubleQuadraticSigmoid (float x){
   functionName = "Double-Quadratic Sigmoid";
