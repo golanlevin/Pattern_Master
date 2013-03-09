@@ -1,14 +1,11 @@
 // PATTERN MASTER
 // Golan Levin, golan@flong.com
-// Spring 2006 - January 2013
+// Spring 2006 - March 2013
 
 
-// TO DO:
-// http://engineeringtraining.tpub.com/14069/css/14069_150.htm
+// Additional functions to consider: 
 // http://en.wikipedia.org/wiki/Generalised_logistic_function Richard's Curve
 // http://en.wikipedia.org/wiki/Probit_function
-// http://mathworld.wolfram.com/HeavisideStepFunction.html
-// generalized damped sinusoid
 
 
 // Java imports for introspection, so we know the functions' arguments. 
@@ -57,6 +54,7 @@ int MAX_N_FLOAT_PARAMS = 4;
 
 DataHistoryGraph noiseHistory;
 DataHistoryGraph cosHistory;
+DataHistoryGraph triHistory;
 
 //-----------------------------------------------------
 void keyPressed() {
@@ -78,9 +76,8 @@ void keyPressed() {
 //-----------------------------------------------------
 void setup() {
   int scrW = (int)(margin0 + bandTh + margin1 + xscale + margin0);
-  int scrH = (int)(margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin0 + bandTh + margin1);
-  size (scrW, scrH);// OPENGL);
-  // println("App dimensions: " + scrW + " x " + scrH);
+  int scrH = (int)(margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin0 + bandTh + margin0 + bandTh + margin1);
+  size (scrW, scrH);
   
   initHistories();
   introspect();
@@ -461,6 +458,7 @@ void initHistories() {
 
   noiseHistory = new DataHistoryGraph ((int)xscale);
   cosHistory   = new DataHistoryGraph ((int)xscale);
+  triHistory   = new DataHistoryGraph ((int)xscale);
 }
 
 
@@ -471,13 +469,24 @@ void drawNoiseHistories() {
   int nData = (int)xscale;
   float noiseVal = noise(millis()/ (nData/2.0));
   float cosVal   = 0.5 + (0.45 * cos(PI * millis()/animationConstant));
+  
+  float ac = animationConstant;
+  
+  float tv = (((int)(millis()/ac))%2 == 0) ? (millis()%ac) : (ac - (millis()%ac));
+  float triVal = 1.0 - tv/ac;
+  
+  
   noiseHistory.update( noiseVal ); 
-  cosHistory.update( cosVal );  
+  cosHistory.update  ( cosVal );  
+  triHistory.update  ( triVal ); 
 
   float nhy = margin0 + bandTh + margin1 + yscale + margin2;
-  float chy = margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin1;
+  
   noiseHistory.draw ( xoffset, nhy); 
-  cosHistory.draw   ( xoffset, chy);
+  nhy += (bandTh + margin1); 
+  cosHistory.draw   ( xoffset, nhy);
+  nhy += (bandTh + margin1); 
+  triHistory.draw   ( xoffset, nhy);
 }
 
 
@@ -543,7 +552,7 @@ void drawModeSpecificGraphics() {
   String lastParamString = params[nParams-1].toString();
   boolean bHasIntegerArgument = (lastParamString.equals("int"));
 
-  float x, y;
+  float x,  y;
   float xa, yb;
   float xc, yd;
   float K = 12;
@@ -555,7 +564,7 @@ void drawModeSpecificGraphics() {
   switch (nParams) {
   case 2:
     if ( methodName.equals("function_AdjustableFwhmHalfGaussian") ||
-      methodName.equals("function_AdjustableSigmaHalfGaussian")) {
+        methodName.equals("function_AdjustableSigmaHalfGaussian")) {
       x = xoffset + param_a * xscale;
       float val = 1.0 - function (param_a, param_a, param_b, param_c, param_d, param_n);
       y = yoffset + yscale * val; 
@@ -581,6 +590,7 @@ void drawModeSpecificGraphics() {
       ellipse(x, y, cr, cr);
     } 
     else {
+      
     }
     break;
 
@@ -621,11 +631,13 @@ void drawModeSpecificGraphics() {
       line(xc-K, yd, xc+K, yd); 
       line(xc, yd-K, xc, yd+K);
 
-      if (methodName.equals("function_CubicBezier")) {
+      if ((methodName.equals("function_CubicBezier")) || 
+          (methodName.equals("function_DoubleQuadraticBezier"))) {
         line (xoffset, yoffset + yscale, xa, yb);
         line (xc, yd, xa, yb);
         line (xoffset + xscale, yoffset, xc, yd);
       }
+      
 
       fill (255, 255, 255); 
       ellipse(xa, yb, cr, cr); 
@@ -636,57 +648,6 @@ void drawModeSpecificGraphics() {
 
 }
 
-//===============================================================
-void drawModeSpecificGraphicsOLD() {
-  float x, y;
-  float xa, yb;
-  float xc, yd;
-  float K = 12;
-
-  noFill();
-  stroke(180, 180, 255);
-
-  switch (FUNCTIONMODE) {
-
-  case 22: // cubic bezier
-    xa = xoffset + param_a * xscale;
-    yb = yoffset + (1-param_b) * yscale;
-    xc = xoffset + param_c * xscale;
-    yd = yoffset + (1-param_d) * yscale;
-    line (xoffset, yoffset + yscale, xa, yb);
-    line (xc, yd, xa, yb);
-    line (xoffset + xscale, yoffset, xc, yd);
-    break;
-
-
-  case 17: // circular fillet
-    x = xoffset + arcCenterX * xscale;
-    y = yoffset + (1-arcCenterY) * yscale;
-    float d = 2.0 * arcRadius * xscale;
-    ellipseMode(CENTER);
-    ellipse(x, y, d, d);
-
-    x = xoffset + param_a * xscale;
-    y = yoffset + (1-param_b) * yscale;
-    line(x-K, y, x+K, y); 
-    line(x, y-K, x, y+K); 
-    break;
-
-  case 34: // function_AdjustableHalfGaussian
-    x = xoffset + param_a * xscale;
-    y = yoffset + yscale * (1.0 - function_AdjustableFwhmHalfGaussian (param_a, param_a));
-    line (x, yoffset+yscale, x, y); 
-    line (xoffset, y, x, y); 
-    break;
-
-  case 35: // function_AdjustableSigmaHalfGaussian
-    x = xoffset + param_a * xscale;
-    y = yoffset + yscale * (1.0 - function_AdjustableSigmaHalfGaussian (param_a, param_a));
-    line (x, yoffset+yscale, x, y); 
-    line (xoffset, y, x, y); 
-    break;
-  }
-}
 
 //===============================================================
 int getCurrentFunctionNArgs() {
@@ -797,18 +758,7 @@ float function (float x, float a, float b, float c, float d, int n) {
   return out;
 }
 
-/*
-// For reference: this is how our old dispatcher was structured, before introspection.
- float functionOLD (float x, float a, float b, float c, float d, int n) {
- float out = 0;
- switch (FUNCTIONMODE) {
- case 0: // etcetera etcetera
- out = function_DoubleLinear (x, a, b);  
- break;
- } 
- return out;
- }
- */
+
 
 
 /////////////////////////////////////////////////////////////////////////

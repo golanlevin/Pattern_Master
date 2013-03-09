@@ -19,4 +19,35 @@ float function_ParabolaThroughAPoint (float x, float a, float b){
 }
 
 
+//------------------------------------------------------------------
+// generalized damped sinusoid
+float function_DampedSinusoid (float x, float a){
+  // http://en.wikipedia.org/wiki/Damped_sine_wave
+  functionName = "Generalized Damped Sinusoid";
+  
+  float omega  = 100*a;
+  float lambda = -6.90775527; // ln(lambda) = 0.001 // decay constant
+  float phi = 0;
+  float e = 2.718281828459045;
+  
+  float t = x;
+  float y = pow(e, lambda*t) * cos(omega*t + phi);
+  return y;
+}
+
+//------------------------------------------------------------------
+// generalized damped sinusoid
+float function_DampedSinusoidReverse (float x, float a){
+  // http://en.wikipedia.org/wiki/Damped_sine_wave
+  functionName = "Generalized Damped Sinusoid (Reverse)";
+  
+  float omega = 100*a;
+  float lambda = -6.90775527; // ln(lambda) = 0.001
+  float phi = 0;
+  float e = 2.718281828459045;
+  
+  float t = 1.0-x;
+  float y = pow(e, lambda*t) * cos(omega*t + phi);
+  return y;
+}
 

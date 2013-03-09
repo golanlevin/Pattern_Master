@@ -28,4 +28,16 @@ float function_Inverse (float x) {
   return 1.0-x;
 }
 
+float function_BoxcarFunction (float x){
+  // http://mathworld.wolfram.com/BoxcarFunction.html
+  // Also see http://mathworld.wolfram.com/HeavisideStepFunction.html
+  functionName = "Boxcar Function";
+  if (x < 0.5){
+    return 0.0; 
+  } else if (x > 0.5){
+    return 1.0; 
+  } 
+  return 0.5;
+}
+
 
