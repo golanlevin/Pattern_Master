@@ -67,9 +67,12 @@ float function_CircularEaseInOut (float x) {
 float function_DoubleQuadraticBezier (float x, float a, float b, float c, float d) {
   functionName = "Double Quadratic Bezier";
   // also see http://engineeringtraining.tpub.com/14069/css/14069_150.htm
+  // produces mysterious values when a=0,b=1,c=0.667,d=0.417
   
   float xmid = (a + c)/2.0; 
   float ymid = (b + d)/2.0; 
+  xmid = constrain (xmid, EPSILON, 1.0-EPSILON);
+  ymid = constrain (ymid, EPSILON, 1.0-EPSILON);
   
   float y = 0;
   float om2a;
@@ -90,7 +93,7 @@ float function_DoubleQuadraticBezier (float x, float a, float b, float c, float 
     y = (1.0-2.0*bb)*(t*t) + (2*bb)*t;
     y *= ymid;
   }
-  if (x > xmid){
+  else {
      xx = (x - xmid)/(1.0-xmid);
      aa = (c - xmid)/(1.0-xmid); 
      bb = (d - ymid)/(1.0-ymid); 
