@@ -53,6 +53,32 @@ float function_TripleLinear (float x, float a, float b, float c, float d) {
   return y;
 }
 
+//------------------------------------------------------------------
+float function_VariableStaircase (float x, float a, int n){
+  functionName = "Variable Staircase";
+  
+  float aa = (a - 0.5);
+  if (aa == 0){
+    return x; 
+  }
+  
+  float x0 = (floor (x*n))/ (float) n; 
+  float x1 = (ceil  (x*n))/ (float) n;
+  float y0 = x0; 
+  float y1 = x1; 
+  
+  float px = 0.5*(x0+x1) + aa/n;
+  float py = 0.5*(x0+x1) - aa/n;
+  
+  float y = 0;
+  if ((x < px) && (x > x0)){
+    y = map(x, x0,px, y0,py);
+  } else {
+    y = map(x, px,x1, py,y1);
+  }
+  
+  return y;
+}
 
 
 
