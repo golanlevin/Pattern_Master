@@ -108,11 +108,16 @@ float function_QuadraticBezierStaircase (float x, float a, int n) {
   float y = 0;
   float denom = (1.0/n)*0.5;
   
-  if ((x < p0x) && (x >= x0)) {
+  if ((x <= p0x) && (x >= x0)) {
     // left side
     if (floor (x*n) <= 0){
       y = map(x, x0, px, y0, py);
     } else {
+      
+      if (abs(x - x0) < EPSILON){
+        // problem when x == x0 !
+      }
+      
       float za = (x0  - (p1x - 1.0/n))/denom; 
       float zb = (y0  - (p1y - 1.0/n))/denom; 
       float zx = ( x  - (p1x - 1.0/n))/denom; 
@@ -130,12 +135,16 @@ float function_QuadraticBezierStaircase (float x, float a, int n) {
     }
   } 
 
-  else if ((x > p1x) && (x <= x1)) {
+  else if ((x >= p1x) && (x <= x1)) {
     // right side
     if (ceil  (x*n) >= n) {
       y = map(x, px, x1, py, y1);
     } 
     else {
+      if (abs(x - x1) < EPSILON){
+        // problem when x == x1 !
+      }
+      
       float za = (x1 - p1x)/denom; 
       float zb = (y1 - p1y)/denom; 
       float zx = ( x - p1x)/denom; 
@@ -143,6 +152,9 @@ float function_QuadraticBezierStaircase (float x, float a, int n) {
         za += EPSILON;
       }
       float om2a = 1.0 - 2.0*za;
+      if (abs(om2a) < EPSILON) {
+        om2a = ((om2a < 0) ? -1:1) * EPSILON;
+      }
       
       float interior = max (0, za*za + om2a*zx);
       float t = (sqrt(interior) - za)/om2a;
@@ -170,17 +182,5 @@ float function_QuadraticBezierStaircase (float x, float a, int n) {
   }
   return y;
 
-
-
-  /*
-  float y = 0;
-   if ((x < px) && (x > x0)){
-   y = map(x, x0,px, y0,py);
-   } else {
-   y = map(x, px,x1, py,y1);
-   }
-   
-   return y;
-   */
 }
 
