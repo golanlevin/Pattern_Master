@@ -21,6 +21,16 @@ float function_PennerEaseOutBack (float x) {
 }
 
 //------------------------------------------------------------------
+float function_BrycePolynomial (float x, int n){
+  functionName = "Bryce's Cubic";
+  
+  float xnm1 = pow (x, n-1); 
+  float xn = xnm1 * x; 
+  
+  return n*xnm1 - (n-1)*xn; 
+}
+
+//------------------------------------------------------------------
 float function_PennerEaseInOutBack (float x) {
   functionName = "Penner's EaseInOut Back";
 
