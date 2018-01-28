@@ -77,7 +77,7 @@ void keyPressed() {
 void setup() {
   int scrW = (int)(margin0 + bandTh + margin1 + xscale + margin0);
   int scrH = (int)(margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin0 + bandTh + margin0 + bandTh + margin1);
-  size (scrW, scrH);
+  size (385,700); // size (scrW, scrH);
   
   initHistories();
   introspect();
@@ -509,6 +509,7 @@ void drawLabels() {
   //------------------
   fill(grayEnable);
   text(functionName, xoffset, yoffset+yscale+yBase);
+  text("Press L/R arrow keys to switch functions.", 10, height-10); 
   int lastArgIndex = (bHasFinalIntArg) ? (nCurrentFunctionArgs-1) : nCurrentFunctionArgs; 
 
   float yPos; 
