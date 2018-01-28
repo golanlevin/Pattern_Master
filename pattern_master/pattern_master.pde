@@ -76,7 +76,7 @@ void keyPressed() {
 //-----------------------------------------------------
 void setup() {
   int scrW = (int)(margin0 + bandTh + margin1 + xscale + margin0);
-  int scrH = (int)(margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin0 + bandTh + margin0 + bandTh + margin1);
+  int scrH = (int)(margin0 + bandTh + margin1 + yscale + margin2 + bandTh + margin0 + bandTh + margin0 + bandTh + margin1 + 30);
   // surface.setSize(scrW, scrH); // @jeffThompson's good idea
   size (385,700); 
   
